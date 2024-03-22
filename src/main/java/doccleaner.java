@@ -67,7 +67,7 @@ public class doccleaner {
         }
         return stem;
     }
-    private Vector<String> extractWords(String url)
+    private static Vector<String> extractWords(String url)
     {
         // extract words in url and return them
         // use StringTokenizer to tokenize the result from StringBean
@@ -82,7 +82,7 @@ public class doccleaner {
     }
     public static Vector<String> wordprocessing(String url){
 
-        Vector<String> content = this.extractWords(url);
+        Vector<String> content = extractWords(url);
         doccleaner dr = new doccleaner("stopwords.txt");
         Vector<String> cleanedcontent = dr.cleanstopwords(content);
         cleanedcontent = dr.stemcontent(cleanedcontent);
