@@ -15,7 +15,6 @@ public class Crawler {
     public Vector<String> extractWords() throws ParserException
 
     {
-
         StringBean sb;
         StringTokenizer tok;
         sb = new StringBean ();
@@ -45,6 +44,5 @@ public class Crawler {
             r.add(String.valueOf(url_array[i]));
         }
         return r;
-
     }
 }
