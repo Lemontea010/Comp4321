@@ -17,12 +17,14 @@ public class web {
 
     private String completetitle;
 
-    web(String _url,int _id,Vector<String> child, String Parent) throws ParserException, IOException {
+
+    web(String _url,int _id,Vector<String> child) throws ParserException, IOException {
+
         this.url=_url;
         this.id=_id;
         this.child_urls=child;
         this.parent_urls = new Vector<>();
-        this.parent_urls.add(Parent);
+
 
         /** creating a cleaned content */
         this.size = doccleaner.getsize(this.url);
@@ -55,7 +57,18 @@ public class web {
         child_urls=child;
     }
 
+    /**
+     *
+     * @param parent
+     * @func add the parent url if it is not inside the parent Vector
+     */
     public void updateParent(String parent){
+
+        //if this parent url is not in the parent vector add new vector
+        for(int i=0;i< parent_urls.size();i++){
+            if(parent_urls.get(i)==parent)
+                return;
+        }
         this.parent_urls.add(parent);
     }
     private void writefileforbody(Vector<String> content) {
