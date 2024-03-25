@@ -1,19 +1,19 @@
 import java.util.HashMap;
 import java.util.Vector;
-import jdbm.RecordManager;
-import jdbm.htree.HTree;
 import org.htmlparser.util.ParserException;
 import java.io.IOException;
 
 public class web {
     private String url;
     private int id;
+
+    private int size;
     private Vector<String> child_urls;
     private Vector<String> parent_urls;
     private Vector<String> title;
     private Vector<String> body;
-    private HashMap<String , String> hashfortitle;
-    private HashMap<String , String> hashforbody;
+    private HashMap<String , Integer> hashfortitle;
+    private HashMap<String , Integer> hashforbody;
 
     private String completetitle;
 
@@ -25,6 +25,7 @@ public class web {
         this.parent_urls.add(Parent);
 
         /** creating a cleaned content */
+        this.size = doccleaner.getsize(this.url);
         this.title = doccleaner.titleprocessing(this.url);
         this.body = doccleaner.bodyprocessing(this.url);
         this.completetitle = doccleaner.gettitle(this.url);
@@ -57,7 +58,7 @@ public class web {
     public void updateParent(String parent){
         this.parent_urls.add(parent);
     }
-    private void writefileforbody(Vector<String> content) throws IOException {
+    private void writefileforbody(Vector<String> content) {
 
         /** all stems extracted from the page body, together with all statistical information needed to
          support the vector space model (i.e., no need to support Boolean operations), are inserted
@@ -67,14 +68,14 @@ public class web {
         for (String word : content) {
             /** new entry */
             if (hashforbody.get(word) == null) {
-                String entry = "1";
+                int entry = 1;
                 /** adding the entry behind if there is previous entries existing */
                 hashforbody.put(word, entry);
             }
             /** add to old entry */
             else {
-                int count = Integer.parseInt((String)hashforbody.get(word)) + 1;
-                hashforbody.put(word, String.valueOf(count));
+                int count = hashforbody.get(word) + 1;
+                hashforbody.put(word, count);
             }
         }
     }
@@ -83,25 +84,28 @@ public class web {
         for(String word : content){
             /** new entry */
             if (hashfortitle.get(word) == null) {
-                String entry = "1";
+                int entry = 1;
                 /** adding the entry behind if there is previous entries existing */
                 hashfortitle.put(word, entry);
             }
             /** add to old entry */
             else{
-                int count = Integer.parseInt((String)hashfortitle.get(word)) + 1;
-                hashfortitle.put(word , String.valueOf(count));
+                int count = hashfortitle.get(word) + 1;
+                hashfortitle.put(word , count);
             }
         }
     }
-    public HashMap<String, String> getHashforbody() {
+    public HashMap<String, Integer> getHashforbody() {
         return hashforbody;
     }
-    public HashMap<String, String> getHashfortitle() {
+    public HashMap<String, Integer> getHashfortitle() {
         return hashfortitle;
     }
     public String getCompletetitle() {
         return this.completetitle;
+    }
+    public int getsize(){
+        return this.size;
     }
 }
 

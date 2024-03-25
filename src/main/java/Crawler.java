@@ -18,7 +18,6 @@ public class Crawler {
         url = _url;
     }
     public Vector<String> extractWords() throws ParserException
-
     {
         StringBean sb;
         StringTokenizer tok;
@@ -68,8 +67,4 @@ public class Crawler {
         return titleandcontent;
     }
 
-    public int size_of_page() throws IOException {
-        Document doc = Jsoup.connect(this.url).get();
-        int size = doc.
-    }
 }
