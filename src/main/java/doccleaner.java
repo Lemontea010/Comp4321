@@ -1,19 +1,10 @@
-
-import org.htmlparser.beans.StringBean;
 import org.htmlparser.util.ParserException;
-
 import java.io.*;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 public class doccleaner {
 
@@ -71,32 +62,12 @@ public class doccleaner {
         return stem;
     }
 
-    private static ArrayList<String> extractContent(String url) throws IOException {
-
-        ArrayList<String> titleandcontent = new ArrayList<>();
-        // Load the web page content
-        Document doc = Jsoup.connect(url).get();
-
-        // Extract the title
-        String title = doc.title();
-        titleandcontent.add(title);
-        // Extract the body
-        Element bodyElement = doc.body();
-        String body = bodyElement.text();
-        titleandcontent.add(body);
-
-        return titleandcontent;
-    }
 
     public static Vector<String> titleprocessing(String url) throws ParserException, IOException {
-        /**
         Crawler cr = new Crawler(url);
-        Vector<String> content = cr.extractWords();
-        */
-
         doccleaner dr = new doccleaner("stopwords.txt");
 
-        String title = extractContent(url).get(0);
+        String title = cr.extractContent().get(0);
         StringTokenizer tok;
         tok=new StringTokenizer(title," ");
         Vector<String> titletoken=new Vector<>();
@@ -104,18 +75,17 @@ public class doccleaner {
             titletoken.add(tok.nextToken());
         }
         Vector<String> cleantitle = dr.cleanstopwords(titletoken);
+        /** stem */
         cleantitle = dr.stemcontent(cleantitle);
-
-        String body = extractContent(url).get(1);
 
         return cleantitle;
     }
 
     public static Vector<String> bodyprocessing(String url) throws ParserException, IOException {
-
+        Crawler cr = new Crawler(url);
         doccleaner dr = new doccleaner("stopwords.txt");
 
-        String body = extractContent(url).get(1);
+        String body = cr.extractContent().get(1);
         StringTokenizer bok;
         bok=new StringTokenizer(body," ");
         Vector<String> bodytoken=new Vector<>();
@@ -123,6 +93,7 @@ public class doccleaner {
             bodytoken.add(bok.nextToken());
         }
         Vector<String> cleanbody = dr.cleanstopwords(bodytoken);
+        /** stem */
         cleanbody = dr.stemcontent(cleanbody);
 
 

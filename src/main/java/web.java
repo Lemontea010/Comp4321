@@ -1,13 +1,8 @@
-import org.htmlparser.beans.StringBean;
 import java.util.Vector;
 import jdbm.RecordManager;
-import jdbm.RecordManagerFactory;
 import jdbm.htree.HTree;
-import jdbm.helper.FastIterator;
 import org.htmlparser.util.ParserException;
-
 import java.io.IOException;
-import java.io.Serializable;
 
 public class web {
     private String url;
@@ -17,7 +12,6 @@ public class web {
     private Vector<String> parent_urls;
     private Vector<String> title;
     private Vector<String> body;
-
     private RecordManager recmantitle;
     private RecordManager recmanbody;
     private HTree hashfortitle;
@@ -29,18 +23,31 @@ public class web {
         this.child_urls=child;
         this.parent_urls = new Vector<>();
         this.parent_urls.add(Parent);
+
         /** creating a cleaned content */
         this.title = doccleaner.titleprocessing(this.url);
         this.body = doccleaner.bodyprocessing(this.url);
+
         /** connect to dB */
-        /** Title */
         this.recmantitle = recmantitle;
         this.recmanbody = recmanbody;
-        this.hashfortitle = HTree.createInstance(this.recmantitle);
-        this.recmantitle.setNamedObject( "T" + String.valueOf(this.id), hashfortitle.getRecid());
+
+        /** Title */
+        if (this.recmantitle.getNamedObject("T" + String.valueOf(this.id)) != 0) {
+            this.hashfortitle = HTree.load(this.recmantitle, this.recmantitle.getNamedObject("T" + String.valueOf(this.id)));
+        }
+        else{
+            this.hashfortitle = HTree.createInstance(this.recmantitle);
+            this.recmantitle.setNamedObject( "T" + String.valueOf(this.id), hashfortitle.getRecid());
+        }
         /** Body */
-        this.hashforbody = HTree.createInstance(this.recmanbody);
-        this.recmanbody.setNamedObject( "B" + String.valueOf(this.id), hashforbody.getRecid());
+        if (this.recmanbody.getNamedObject("B" + String.valueOf(this.id)) != 0) {
+            this.hashforbody = HTree.load(this.recmanbody, this.recmanbody.getNamedObject("B" + String.valueOf(this.id)));
+        }
+        else{
+            this.hashforbody = HTree.createInstance(this.recmanbody);
+            this.recmanbody.setNamedObject( "B" + String.valueOf(this.id), hashforbody.getRecid());
+        }
         /** indexer */
         this.writefileforbody(this.body);
         this.writefilefortitle(this.title);
@@ -66,8 +73,6 @@ public class web {
         this.parent_urls.add(parent);
     }
     private void writefileforbody(Vector<String> content) throws IOException {
-
-        /** Todo : write the cleaned content to the dB */
 
         /** all stems extracted from the page body, together with all statistical information needed to
          support the vector space model (i.e., no need to support Boolean operations), are inserted
