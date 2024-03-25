@@ -1,4 +1,7 @@
 import java.util.HashMap;
+
+import java.util.Iterator;
+
 import java.util.Vector;
 import org.htmlparser.util.ParserException;
 import java.io.IOException;
@@ -15,6 +18,10 @@ public class web {
     private HashMap<String , Integer> hashfortitle;
     private HashMap<String , Integer> hashforbody;
 
+    private HashMap<String , Double> score;
+    private int max_word;
+
+
     private String completetitle;
 
 
@@ -24,7 +31,7 @@ public class web {
         this.id=_id;
         this.child_urls=child;
         this.parent_urls = new Vector<>();
-
+        max_word=0;
 
         /** creating a cleaned content */
         this.size = doccleaner.getsize(this.url);
@@ -36,9 +43,19 @@ public class web {
         this.hashfortitle = new HashMap<>();
         /** Body */
         this.hashforbody = new HashMap<>();
+
+        this.score=new HashMap<>();
+
         /** indexer */
         this.writefileforbody(this.body);
         this.writefilefortitle(this.title);
+        Iterator iter = hashforbody.keySet().iterator();
+        String x;
+        while((x=((String)iter.next()))!=null){
+            if(hashforbody.get(x)>max_word){
+                max_word=hashforbody.get(x);
+            }
+        }
 
     }
     String getUrl(){
@@ -55,6 +72,14 @@ public class web {
     }
     void updateChild(Vector<String> child){
         child_urls=child;
+    }
+
+    void update_score(String word, double score){
+        if(this.score.get(word)!=null) {
+            this.score.replace(word, score);
+        }else{
+            this.score.put(word,score);
+        }
     }
 
     /**
@@ -120,5 +145,10 @@ public class web {
     public int getsize(){
         return this.size;
     }
+
+    public int getmax(){
+        return max_word;
+    }
+
 }
 
