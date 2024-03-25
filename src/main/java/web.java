@@ -17,7 +17,7 @@ public class web {
     private HTree hashfortitle;
     private HTree hashforbody;
 
-    web(String _url,int _id,Vector<String> child,  RecordManager recmantitle, RecordManager recmanbody) throws ParserException, IOException {
+    web(String _url,int _id,Vector<String> child) throws ParserException, IOException {
         this.url=_url;
         this.id=_id;
         this.child_urls=child;

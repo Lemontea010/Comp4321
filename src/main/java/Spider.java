@@ -47,7 +47,7 @@ public class Spider {
                 }
                 else{
                     num_urls +=1;                       //if url not exist
-                    urls.put(_url,new web(temp.get(i),num_urls,get_url_recursive(temp.get(i)));//create new web class
+                    urls.put(_url,new web(temp.get(i),num_urls,get_url_recursive(temp.get(i))));//create new web class
                     urls.get(temp.get(i)).updateParent(_url);//update web class parent
                 }
 
@@ -62,7 +62,7 @@ public class Spider {
     public int get_num_urls(){
         return num_urls;
     }
-    public Vector<web> geturls(){
+    public HashMap<String,web> geturls(){
         return urls;
     }
 }
