@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Vector;
 import jdbm.RecordManager;
 import jdbm.htree.HTree;
@@ -8,16 +9,15 @@ public class web {
     private String url;
     private int id;
     private Vector<String> child_urls;
-
     private Vector<String> parent_urls;
     private Vector<String> title;
     private Vector<String> body;
-    private RecordManager recmantitle;
-    private RecordManager recmanbody;
-    private HTree hashfortitle;
-    private HTree hashforbody;
+    private HashMap<String , String> hashfortitle;
+    private HashMap<String , String> hashforbody;
 
-    web(String _url,int _id,Vector<String> child, String Parent , RecordManager recmantitle, RecordManager recmanbody) throws ParserException, IOException {
+    private String completetitle;
+
+    web(String _url,int _id,Vector<String> child, String Parent) throws ParserException, IOException {
         this.url=_url;
         this.id=_id;
         this.child_urls=child;
@@ -27,27 +27,12 @@ public class web {
         /** creating a cleaned content */
         this.title = doccleaner.titleprocessing(this.url);
         this.body = doccleaner.bodyprocessing(this.url);
-
-        /** connect to dB */
-        this.recmantitle = recmantitle;
-        this.recmanbody = recmanbody;
+        this.completetitle = doccleaner.gettitle(this.url);
 
         /** Title */
-        if (this.recmantitle.getNamedObject("T" + String.valueOf(this.id)) != 0) {
-            this.hashfortitle = HTree.load(this.recmantitle, this.recmantitle.getNamedObject("T" + String.valueOf(this.id)));
-        }
-        else{
-            this.hashfortitle = HTree.createInstance(this.recmantitle);
-            this.recmantitle.setNamedObject( "T" + String.valueOf(this.id), hashfortitle.getRecid());
-        }
+        this.hashfortitle = new HashMap<>();
         /** Body */
-        if (this.recmanbody.getNamedObject("B" + String.valueOf(this.id)) != 0) {
-            this.hashforbody = HTree.load(this.recmanbody, this.recmanbody.getNamedObject("B" + String.valueOf(this.id)));
-        }
-        else{
-            this.hashforbody = HTree.createInstance(this.recmanbody);
-            this.recmanbody.setNamedObject( "B" + String.valueOf(this.id), hashforbody.getRecid());
-        }
+        this.hashforbody = new HashMap<>();
         /** indexer */
         this.writefileforbody(this.body);
         this.writefilefortitle(this.title);
@@ -108,6 +93,15 @@ public class web {
                 hashfortitle.put(word , String.valueOf(count));
             }
         }
+    }
+    public HashMap<String, String> getHashforbody() {
+        return hashforbody;
+    }
+    public HashMap<String, String> getHashfortitle() {
+        return hashfortitle;
+    }
+    public String getCompletetitle() {
+        return this.completetitle;
     }
 }
 

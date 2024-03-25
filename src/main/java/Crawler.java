@@ -67,4 +67,9 @@ public class Crawler {
 
         return titleandcontent;
     }
+
+    public int size_of_page() throws IOException {
+        Document doc = Jsoup.connect(this.url).get();
+        int size = doc.
+    }
 }
