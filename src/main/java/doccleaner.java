@@ -99,4 +99,17 @@ public class doccleaner {
 
         return cleanbody;
     }
+
+    public static String gettitle(String url)throws ParserException, IOException {
+        Crawler cr = new Crawler(url);
+        String title = cr.extractContent().get(0);
+        return title;
+    }
+
+    public static int getsize(String url)throws ParserException, IOException {
+        Crawler cr = new Crawler(url);
+        int size = cr.extractWords().size();
+        return size;
+    }
+
 }
