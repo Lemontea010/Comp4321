@@ -1,5 +1,8 @@
+import jdbm.RecordManager;
+import jdbm.htree.HTree;
 import org.htmlparser.util.ParserException;
 
+import java.io.IOException;
 import java.util.Vector;
 
 public class Spider {
@@ -7,18 +10,24 @@ public class Spider {
 
     private int num_urls;   //total num = num_urls+1
 
+    private RecordManager recmantitle;
+
+    private RecordManager recmanbody;
+    private HTree hashtable;
     /**
      *
      * @param _url
      * @throws ParserException
      */
-    Spider(String _url) throws ParserException {
+    Spider(String _url, RecordManager recmantitle, RecordManager recmanbody,  HTree hashtable) throws ParserException, IOException {
         Crawler crawler = new Crawler(_url);
         num_urls = 1;
         urls = new Vector<>();
-        urls.add(new web(_url,0,crawler.extractLinks()));
+        this.hashtable = hashtable;
+        this.recmantitle = recmantitle;
+        this.recmanbody = recmanbody;
+        urls.add(new web(_url,0,crawler.extractLinks());
         this.get_url_recursive(_url);
-
     }
 
     /**
@@ -43,7 +52,7 @@ public class Spider {
                 }
             }
             return temp;
-        } catch (ParserException e) {
+        } catch (ParserException | IOException e) {
             e.printStackTrace();
         }
         Vector<String> temp =new Vector<>();
