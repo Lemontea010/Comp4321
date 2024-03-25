@@ -33,12 +33,11 @@ public class web {
         this.title = doccleaner.titleprocessing(this.url);
         this.body = doccleaner.bodyprocessing(this.url);
         /** connect to dB */
-        this.recmantitle = RecordManagerFactory.createRecordManager("Title" + String.valueOf(this.id) );
+        /** Title */
         this.hashfortitle = HTree.createInstance(this.recmantitle);
         this.recmantitle.setNamedObject( "T" + String.valueOf(this.id), hashfortitle.getRecid());
-
-        this.recmanbody = RecordManagerFactory.createRecordManager("Body" + String.valueOf(this.id));
-        this.hashforbody = HTree.createInstance(this.recmantitle);
+        /** Body */
+        this.hashforbody = HTree.createInstance(this.recmanbody);
         this.recmanbody.setNamedObject( "B" + String.valueOf(this.id), hashforbody.getRecid());
         /** indexer */
         this.writefileforbody(this.body);
@@ -80,7 +79,7 @@ public class web {
                 /** adding the entry behind if there is previous entries existing */
                 hashforbody.put(word, entry);
             }
-            /** add to new entry */
+            /** add to old entry */
             else {
                 int count = Integer.parseInt((String)hashforbody.get(word)) + 1;
                 hashforbody.put(word, String.valueOf(count));
