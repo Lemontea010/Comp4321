@@ -26,7 +26,7 @@ public class Spider {
         this.hashtable = hashtable;
         this.recmantitle = recmantitle;
         this.recmanbody = recmanbody;
-        urls.add(new web(_url,0,crawler.extractLinks());
+        urls.add(new web(_url,0,crawler.extractLinks(),recmantitle,recmanbody));
         this.get_url_recursive(_url);
     }
 
@@ -43,11 +43,13 @@ public class Spider {
             for(int i=0;i<temp.size();i++){
                 for(int j=0;j<urls.size();j++){
                     if(temp.get(i)==urls.get(j).getUrl()){
+                        urls.get(j).updateParent(_url);
                         break;
                     }
                     else if(j+1==urls.size()){
                         num_urls +=1;
-                        urls.add(new web(temp.get(i),num_urls,get_url_recursive(temp.get(i))));
+                        urls.add(new web(temp.get(i),num_urls,get_url_recursive(temp.get(i)),recmantitle,recmanbody));
+                        urls.get(j+1).updateParent(_url);
                     }
                 }
             }
