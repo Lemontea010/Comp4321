@@ -1,5 +1,7 @@
 import java.util.HashMap;
+
 import java.util.Iterator;
+
 import java.util.Vector;
 import org.htmlparser.util.ParserException;
 import java.io.IOException;
@@ -15,8 +17,10 @@ public class web {
     private Vector<String> body;
     private HashMap<String , Integer> hashfortitle;
     private HashMap<String , Integer> hashforbody;
+
     private HashMap<String , Double> score;
     private int max_word;
+
 
     private String completetitle;
 
@@ -39,7 +43,9 @@ public class web {
         this.hashfortitle = new HashMap<>();
         /** Body */
         this.hashforbody = new HashMap<>();
+
         this.score=new HashMap<>();
+
         /** indexer */
         this.writefileforbody(this.body);
         this.writefilefortitle(this.title);
@@ -139,8 +145,10 @@ public class web {
     public int getsize(){
         return this.size;
     }
+
     public int getmax(){
         return max_word;
     }
+
 }
 

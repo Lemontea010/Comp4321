@@ -18,7 +18,6 @@ public class Crawler {
         url = _url;
     }
     public Vector<String> extractWords() throws ParserException
-
     {
         StringBean sb;
         StringTokenizer tok;
@@ -67,4 +66,5 @@ public class Crawler {
 
         return titleandcontent;
     }
+
 }
