@@ -3,30 +3,28 @@ import jdbm.htree.HTree;
 import org.htmlparser.util.ParserException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Vector;
 
 public class Spider {
-    private Vector<web> urls;
+    private HashMap<String,web> urls;
 
     private int num_urls;   //total num = num_urls+1
 
-    private RecordManager recmantitle;
+    private RecordManager db;
 
-    private RecordManager recmanbody;
-    private HTree hashtable;
+
+
     /**
      *
      * @param _url
      * @throws ParserException
      */
-    Spider(String _url, RecordManager recmantitle, RecordManager recmanbody,  HTree hashtable) throws ParserException, IOException {
+    Spider(String _url) throws ParserException, IOException {
         Crawler crawler = new Crawler(_url);
         num_urls = 1;
-        urls = new Vector<>();
-        this.hashtable = hashtable;
-        this.recmantitle = recmantitle;
-        this.recmanbody = recmanbody;
-        urls.add(new web(_url,0,crawler.extractLinks(),recmantitle,recmanbody));
+        urls = new HashMap<>();
+        urls.put(_url,new web(_url,0,crawler.extractLinks()));
         this.get_url_recursive(_url);
     }
 
@@ -40,18 +38,19 @@ public class Spider {
             Crawler crawler = new Crawler(_url);
             Vector<String> temp =crawler.extractLinks();
 
+
+
+
             for(int i=0;i<temp.size();i++){
-                for(int j=0;j<urls.size();j++){
-                    if(temp.get(i)==urls.get(j).getUrl()){
-                        urls.get(j).updateParent(_url);
-                        break;
-                    }
-                    else if(j+1==urls.size()){
-                        num_urls +=1;
-                        urls.add(new web(temp.get(i),num_urls,get_url_recursive(temp.get(i)),recmantitle,recmanbody));
-                        urls.get(j+1).updateParent(_url);
-                    }
+                if(urls.get(temp.get(i))!=null){        //if url exist
+                    urls.get(temp.get(i)).updateParent(_url);   // update parent
                 }
+                else{
+                    num_urls +=1;                       //if url not exist
+                    urls.put(_url,new web(temp.get(i),num_urls,get_url_recursive(temp.get(i)));//create new web class
+                    urls.get(temp.get(i)).updateParent(_url);//update web class parent
+                }
+
             }
             return temp;
         } catch (ParserException | IOException e) {
