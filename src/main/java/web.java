@@ -23,7 +23,7 @@ public class web {
     private HTree hashfortitle;
     private HTree hashforbody;
 
-    web(String _url,int _id,Vector<String> child, String Parent) throws ParserException, IOException {
+    web(String _url,int _id,Vector<String> child, String Parent , RecordManager recmantitle, RecordManager recmanbody) throws ParserException, IOException {
         this.url=_url;
         this.id=_id;
         this.child_urls=child;
@@ -34,6 +34,8 @@ public class web {
         this.body = doccleaner.bodyprocessing(this.url);
         /** connect to dB */
         /** Title */
+        this.recmantitle = recmantitle;
+        this.recmanbody = recmanbody;
         this.hashfortitle = HTree.createInstance(this.recmantitle);
         this.recmantitle.setNamedObject( "T" + String.valueOf(this.id), hashfortitle.getRecid());
         /** Body */
