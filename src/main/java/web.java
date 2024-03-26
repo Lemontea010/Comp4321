@@ -1,12 +1,15 @@
+import java.io.Serializable;
 import java.util.HashMap;
 
 import java.util.Iterator;
 
 import java.util.Vector;
+
+import jdbm.helper.Serializer;
 import org.htmlparser.util.ParserException;
 import java.io.IOException;
 
-public class web {
+public  class web implements Serializable {
     private String url;
     private int id;
 
@@ -32,6 +35,7 @@ public class web {
         this.child_urls=child;
         this.parent_urls = new Vector<>();
         max_word=0;
+        this.score=new HashMap<>();
 
         /** creating a cleaned content */
         this.size = doccleaner.getsize(this.url);
@@ -44,14 +48,15 @@ public class web {
         /** Body */
         this.hashforbody = new HashMap<>();
 
-        this.score=new HashMap<>();
+        //this.score=new HashMap<>();
 
         /** indexer */
         this.writefileforbody(this.body);
         this.writefilefortitle(this.title);
         Iterator iter = hashforbody.keySet().iterator();
         String x;
-        while((x=((String)iter.next()))!=null){
+        while(iter.hasNext()){
+            x=(String)iter.next();
             if(hashforbody.get(x)>max_word){
                 max_word=hashforbody.get(x);
             }
@@ -83,18 +88,19 @@ public class web {
     }
 
     /**
-     *
+     * @return true if already in database false otherwise
      * @param parent
      * @func add the parent url if it is not inside the parent Vector
      */
-    public void updateParent(String parent){
+    public boolean updateParent(String parent){
 
         //if this parent url is not in the parent vector add new vector
         for(int i=0;i< parent_urls.size();i++){
             if(parent_urls.get(i)==parent)
-                return;
+                return true;
         }
         this.parent_urls.add(parent);
+        return false;
     }
     private void writefileforbody(Vector<String> content) {
 

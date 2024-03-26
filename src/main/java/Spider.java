@@ -32,11 +32,11 @@ public class Spider {
         db = RecordManagerFactory.createRecordManager("indexer");
         urls = HTree.createInstance(db);
         indexer=new Indexer();
-        urls.put(_url,new web(_url,0,crawler.extractLinks()));//Htree<String url,web>
         this.get_url_recursive(_url);
         FastIterator iter_web=urls.values();
         Set<String> iter_word;
         web w;
+
         while((w=(web)iter_web.next())!=null){
 
             iter_word = w.getHashforbody().keySet();
@@ -68,19 +68,22 @@ public class Spider {
         try {
             Crawler crawler = new Crawler(_url);
             Vector<String> temp =crawler.extractLinks();
-
-
+            System.out.println(_url+"\n");
+            if(num_urls>=299){
+                return temp;
+            }
+            if(urls.get(_url)!=null){
+                return temp;
+            }else{
+                num_urls +=1;                       //if url not exist
+                urls.put(_url,new web(_url,num_urls,temp));//create new web class
+                //update web class parent
+            }
 
 
             for(int i=0;i<temp.size();i++){
-                if(urls.get(temp.get(i))!=null){        //if url exist
-                    ((web)urls.get(temp.get(i))).updateParent(_url);   // update parent
-                }
-                else{
-                    num_urls +=1;                       //if url not exist
-                    urls.put(_url,new web(temp.get(i),num_urls,get_url_recursive(temp.get(i))));//create new web class
-                    ((web)urls.get(temp.get(i))).updateParent(_url);//update web class parent
-                }
+                get_url_recursive(temp.get(i));
+                ((web)urls.get(temp.get(i))).updateParent(_url);
 
             }
             return temp;
@@ -96,4 +99,5 @@ public class Spider {
     public HTree geturls(){
         return urls;
     }
+
 }
