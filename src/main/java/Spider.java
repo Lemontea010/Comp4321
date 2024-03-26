@@ -57,6 +57,8 @@ public class Spider {
                 w.update_score(word,score);
             }
         }
+        db.commit();
+        db.close();
     }
 
     /**
