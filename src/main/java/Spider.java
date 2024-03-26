@@ -43,7 +43,7 @@ public class Spider {
             Iterator<String> stringIterator=iter_word.iterator();
             if(stringIterator.hasNext()) {
                 String word=stringIterator.next();
-                indexer.replace_count(word,indexer.get_idf(word)+w.getHashforbody().get(word));
+                indexer.replace_count(word);
             }
 
         }
@@ -53,7 +53,7 @@ public class Spider {
             Iterator<String> stringIterator=iter_word.iterator();
             if(stringIterator.hasNext()) {
                 String word=stringIterator.next();
-                double score=(w.getHashforbody().get(word))/(w.getmax())*((Math.log(num_urls)/indexer.get_idf(word))/Math.log(2));
+                double score=(w.getHashforbody().get(word))/(w.getmax())*((Math.log(num_urls)/indexer.get_df(word))/Math.log(2));
                 w.update_score(word,score);
             }
         }
