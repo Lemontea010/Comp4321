@@ -5,10 +5,8 @@ import jdbm.htree.HTree;
 import org.htmlparser.util.ParserException;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Spider {
     private HTree urls;
@@ -70,7 +68,7 @@ public class Spider {
         try {
             Crawler crawler = new Crawler(_url);
             Vector<String> temp =crawler.extractLinks();
-            System.out.println(_url+"\n");
+
             if(num_urls>=299){
                 return temp;
             }
@@ -79,6 +77,12 @@ public class Spider {
             }else{
                 num_urls +=1;                       //if url not exist
                 urls.put(_url,new web(_url,num_urls,temp));//create new web class
+                System.out.println(_url+"\n");
+                int x=((web)urls.get(_url)).getsize();
+                long y =((web)urls.get(_url)).getLastmodified_date();
+                Date date = new Date(y);
+                System.out.println("Size :"+x+" Byte\n");
+                System.out.println("Last Modified Date :"+date+"\n");
                 //update web class parent
             }
 

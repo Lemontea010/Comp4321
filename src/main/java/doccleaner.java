@@ -3,6 +3,8 @@ import java.io.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 
@@ -106,10 +108,16 @@ public class doccleaner {
         return title;
     }
 
-    public static int getsize(String url)throws ParserException, IOException {
-        Crawler cr = new Crawler(url);
-        int size = cr.extractWords().size();
-        return size;
+    public static int getsize(String _url)throws ParserException, IOException {
+        URL url = new URL(_url);
+        URLConnection connection=url.openConnection();
+
+        return connection.getContentLength();
+    }
+    public static long get_lastmodified(String _url) throws IOException {
+        URL url = new URL(_url);
+        URLConnection connection =url.openConnection();
+        return connection.getLastModified();
     }
 
 }
