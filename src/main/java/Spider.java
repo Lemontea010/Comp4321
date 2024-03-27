@@ -77,12 +77,12 @@ public class Spider {
             }else{
                 num_urls +=1;                       //if url not exist
                 urls.put(_url,new web(_url,num_urls,temp));//create new web class
-                System.out.println(_url+"\n");
+                //System.out.println(_url+"\n");
                 int x=((web)urls.get(_url)).getsize();
                 long y =((web)urls.get(_url)).getLastmodified_date();
                 Date date = new Date(y);
-                System.out.println("Size :"+x+" Byte\n");
-                System.out.println("Last Modified Date :"+date+"\n");
+                //System.out.println("Size :"+x+" Byte\n");
+                //System.out.println("Last Modified Date :"+date+"\n");
                 //update web class parent
             }
 
