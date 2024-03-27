@@ -14,6 +14,7 @@ public  class web implements Serializable {
     private int id;
 
     private int size;
+    private long lastmodified_date;
     private Vector<String> child_urls;
     private Vector<String> parent_urls;
     private Vector<String> title;
@@ -42,6 +43,7 @@ public  class web implements Serializable {
         this.title = doccleaner.titleprocessing(this.url);
         this.body = doccleaner.bodyprocessing(this.url);
         this.completetitle = doccleaner.gettitle(this.url);
+        this.lastmodified_date=doccleaner.get_lastmodified(this.url);
 
         /** Title */
         this.hashfortitle = new HashMap<>();
@@ -154,6 +156,9 @@ public  class web implements Serializable {
 
     public int getmax(){
         return max_word;
+    }
+    public long getLastmodified_date(){
+        return lastmodified_date;
     }
 
 }
