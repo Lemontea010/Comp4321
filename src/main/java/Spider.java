@@ -21,7 +21,7 @@ public class Spider {
 
     private Indexer indexer;
 
-
+    private final int limit=30;
 
 
 
@@ -79,7 +79,7 @@ public class Spider {
             Crawler crawler = new Crawler(_url);
             Vector<String> temp =crawler.extractLinks();
 
-            if(num_urls>=30){
+            if(num_urls>=limit){
                 return temp;
             }
             if(urls.get(_url)!=null){
@@ -102,7 +102,7 @@ public class Spider {
 
             for(int i=0;i<temp.size();i++){
                 get_url_recursive(temp.get(i));
-                if(num_urls>=30){
+                if(num_urls>=limit){
                     break;
                 }
                 ((web)urls.get(temp.get(i))).updateParent(_url);
@@ -147,7 +147,7 @@ public class Spider {
             key=hashtable1.keys();
             String word;
             while((word=(String)key.next())!=null){
-                System.out.println("Word : "+word+" Frequency : "+hashtable1.get(word));
+                System.out.println("Word : "+word+" id : "+hashtable1.get(word));
         }
 
         }
