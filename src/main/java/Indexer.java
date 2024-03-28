@@ -1,28 +1,111 @@
-import java.util.Hashtable;
+import jdbm.RecordManager;
+import jdbm.htree.HTree;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import java.util.Vector;
 
 public class Indexer {
 
-    private Hashtable<String, Integer> record;
+
+    private HTree hashforbody;             //<int word_id,<int doc_id,int freq>>
+    private HTree hashfortitle;             //<int word_id,<int doc_id,int freq>>
+    private HTree word_to_id;               //<String word , int id>
+    private int num_of_word;
     /** ArrayList 0: DF */
 
-    public Indexer(){
-        this.record = new Hashtable<>();
+    public Indexer(RecordManager db) throws IOException {
+
+        hashfortitle=HTree.createInstance(db);
+        db.setNamedObject("Htree_title",hashfortitle.getRecid());
+        hashforbody=HTree.createInstance(db);
+        db.setNamedObject("Htree_body",hashforbody.getRecid());
+        word_to_id=HTree.createInstance(db);
+        db.setNamedObject("Htree_word_to_id",word_to_id.getRecid());
+        num_of_word=0;
+
+
+
     }
 
-    void replace_count(String word){
-        int count;
-        if(this.record.containsKey(word)){
-            count = this.record.get(word);
-            count = count + 1;
-            this.record.put(word , count);
-        }
-        else{
-            count = 1;
-            this.record.put(word , count);
+    public void put(Vector<String> title , Vector<String> body ,int id) throws IOException {
+        writefilefortitle(title,id);
+        writefileforbody(body,id);
+
+    }
+
+    private void writefileforbody(Vector<String> content,int id) throws IOException {
+
+        /** all stems extracted from the page body, together with all statistical information needed to
+         support the vector space model (i.e., no need to support Boolean operations), are inserted
+         into one inverted file */
+        HashMap<Integer,Integer> temp;
+        /** title: stem of the title ; body: stem of the body */
+        for (String word : content) {
+            /** new entry */
+            if(word_to_id.get(word)==null){                 // if word not exist in the file
+                word_to_id.put(word,num_of_word);
+                num_of_word+=1;
+            }
+            int x = (int)word_to_id.get(word);
+            if (hashforbody.get(x) == null) {               //if the word does not exist in the body
+                int entry = 1;
+
+                /** adding the entry behind if there is previous entries existing */
+                temp=new HashMap<>();                       //create new word in body
+                temp.put(id,entry);
+                hashforbody.put(word_to_id.get(word), temp);
+            }
+            /** add to old entry */
+            else {                                  //if the word exist in the body
+                temp = (HashMap<Integer,Integer>)hashforbody.get(x);
+                int entry;
+                if(temp.get(id)==null){             // if the web does not exist in the file
+                    entry=1;                        //entry =1
+                }
+                else{
+                    entry=temp.get(id)+1;           //entry = original count +1
+                }
+                temp.put(x,entry);
+                hashforbody.put(id, temp);
+            }
         }
     }
 
-    double get_df(String word){
-        return this.record.get(word);
+    private void writefilefortitle(Vector<String> content,int id) throws IOException {
+        HashMap<Integer, Integer> temp;
+        /** title: stem of the title ; body: stem of the body */
+        for (String word : content) {
+            /** new entry */
+            if (word_to_id.get(word) == null) {                 // if word not exist in the file
+                word_to_id.put(word, num_of_word);
+                num_of_word += 1;
+            }
+            int x = (int)word_to_id.get(word);
+            if (hashfortitle.get(x) == null) {               //if the word does not exist in the body
+                int entry = 1;
+                /** adding the entry behind if there is previous entries existing */
+                temp = new HashMap<>();                       //create new word in body
+                temp.put(id, entry);
+                hashfortitle.put(word_to_id.get(word), temp);
+            }
+            /** add to old entry */
+            else {                                  //if the word exist in the body
+                temp = (HashMap<Integer,Integer>)hashfortitle.get(x);
+                int entry;
+                if (temp.get(id) == null) {             // if the web does not exist in the file
+                    entry = 1;                        //entry =1
+                } else {
+                    entry = temp.get(id) + 1;           //entry = original count +1
+                }
+                temp.put(x, entry);
+                hashfortitle.put(id, temp);
+            }
+        }
+    }
+
+    public int getNum_of_word() {
+        return num_of_word;
     }
 }
