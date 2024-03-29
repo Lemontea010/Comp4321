@@ -36,22 +36,14 @@ public class doccleaner {
         }
     }
 
-    private Vector<String> cleanstopwords (Vector<String> content){
+    private Vector<String> stopstem (Vector<String> content){
         Vector<String> cleancontent = new Vector<>();
         for(String element : content.toArray(new String[0])){
             if(!stopWords.contains(element)){
-                cleancontent.add(element);
+                cleancontent.add(porter.stripAffixes(element));
             }
         }
         return cleancontent;
-    }
-    private Vector<String> stemcontent(Vector<String> content){
-        Vector<String> stem = new Vector<>();
-
-        for(String str : content){
-            stem.add(porter.stripAffixes(str));
-        }
-        return stem;
     }
 
     public static Vector<String> titleprocessing(String url) throws ParserException, IOException {
@@ -67,10 +59,9 @@ public class doccleaner {
         for(int i=0; i< tokens.length; i++){
             vec_tokens.add(tokens[i]);
         }
-        Vector<String> cleantitle = dr.cleanstopwords(vec_tokens);
 
-        /** stem */
-        cleantitle = dr.stemcontent(cleantitle);
+        /** remove stopword and stemming */
+        Vector<String> cleantitle = dr.stopstem(vec_tokens);
         return cleantitle;
     }
 
@@ -84,19 +75,19 @@ public class doccleaner {
         for(int i=0; i< tokens.length; i++){
             vec_tokens.add(tokens[i]);
         }
-        Vector<String> cleanbody = dr.cleanstopwords(vec_tokens);
-        /** stem */
-        cleanbody = dr.stemcontent(cleanbody);
+
+        /** remove stopword and stemming */
+        Vector<String> cleanbody = dr.stopstem(vec_tokens);
         return cleanbody;
     }
 
-    public static String gettitle(String url)throws ParserException, IOException {
+    public static String gettitle(String url)throws IOException {
         Crawler cr = new Crawler(url);
         String title = cr.extractContent().get(0);
         return title;
     }
 
-    public static int getsize(String _url)throws ParserException, IOException {
+    public static int getsize(String _url)throws IOException {
         URL url = new URL(_url);
         URLConnection connection=url.openConnection();
         return connection.getContentLength();
