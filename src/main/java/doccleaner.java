@@ -60,7 +60,6 @@ public class doccleaner {
 
         String title = cr.extractContent().get(0);
         /** checking */
-        System.out.println("title: "+title);
 
         String[] tokens = title.split("[ ,?]+");
         Vector<String> vec_tokens = new Vector<>();
@@ -84,6 +83,7 @@ public class doccleaner {
         for(int i=0; i< tokens.length; i++){
             vec_tokens.add(tokens[i]);
         }
+
         Vector<String> cleanbody = dr.cleanstopwords(vec_tokens);
         /** stem */
         cleanbody = dr.stemcontent(cleanbody);

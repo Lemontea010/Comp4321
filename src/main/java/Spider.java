@@ -21,7 +21,7 @@ public class Spider {
 
     private Indexer indexer;
 
-    private final int limit=30;
+    private final int limit=300;
 
 
 
@@ -126,7 +126,7 @@ public class Spider {
         try
         {
             Spider spider =new Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
-            RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
+            /*RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
             long recid = recman.getNamedObject("id_to_web");
             HTree hashtable = HTree.load(recman, recid);
             FastIterator key=hashtable.keys();
@@ -148,7 +148,7 @@ public class Spider {
             String word;
             while((word=(String)key.next())!=null){
                 System.out.println("Word : "+word+" id : "+hashtable1.get(word));
-        }
+        }*/
 
         }
         catch(IOException ex)
