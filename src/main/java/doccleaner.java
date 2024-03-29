@@ -48,38 +48,29 @@ public class doccleaner {
     private Vector<String> stemcontent(Vector<String> content){
         Vector<String> stem = new Vector<>();
 
-        //vector to string
-        StringBuilder sb = new StringBuilder();
-        for (String element : content) {
-            sb.append(element);
-            sb.append(" ");
-        }
-        String stemword = porter.stripAffixes(String.valueOf(sb));
-        //string to vector
-        String[] elements = stemword.split(" ");
-
-        for (String element : elements) {
-            stem.add(element);
+        for(String str : content){
+            stem.add(porter.stripAffixes(str));
         }
         return stem;
     }
-
 
     public static Vector<String> titleprocessing(String url) throws ParserException, IOException {
         Crawler cr = new Crawler(url);
         doccleaner dr = new doccleaner("stopwords.txt");
 
         String title = cr.extractContent().get(0);
-        StringTokenizer tok;
-        tok=new StringTokenizer(title," ");
-        Vector<String> titletoken=new Vector<>();
-        while(tok.hasMoreElements()){
-            titletoken.add(tok.nextToken());
+        /** checking */
+        System.out.println("title: "+title);
+
+        String[] tokens = title.split("[ ,?]+");
+        Vector<String> vec_tokens = new Vector<>();
+        for(int i=0; i< tokens.length; i++){
+            vec_tokens.add(tokens[i]);
         }
-        Vector<String> cleantitle = dr.cleanstopwords(titletoken);
+        Vector<String> cleantitle = dr.cleanstopwords(vec_tokens);
+
         /** stem */
         cleantitle = dr.stemcontent(cleantitle);
-
         return cleantitle;
     }
 
@@ -88,17 +79,14 @@ public class doccleaner {
         doccleaner dr = new doccleaner("stopwords.txt");
 
         String body = cr.extractContent().get(1);
-        StringTokenizer bok;
-        bok=new StringTokenizer(body," ");
-        Vector<String> bodytoken=new Vector<>();
-        while(bok.hasMoreElements()){
-            bodytoken.add(bok.nextToken());
+        String[] tokens = body.split("[ ,?]+");
+        Vector<String> vec_tokens = new Vector<>();
+        for(int i=0; i< tokens.length; i++){
+            vec_tokens.add(tokens[i]);
         }
-        Vector<String> cleanbody = dr.cleanstopwords(bodytoken);
+        Vector<String> cleanbody = dr.cleanstopwords(vec_tokens);
         /** stem */
         cleanbody = dr.stemcontent(cleanbody);
-
-
         return cleanbody;
     }
 
@@ -111,7 +99,6 @@ public class doccleaner {
     public static int getsize(String _url)throws ParserException, IOException {
         URL url = new URL(_url);
         URLConnection connection=url.openConnection();
-
         return connection.getContentLength();
     }
     public static long get_lastmodified(String _url) throws IOException {
