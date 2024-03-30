@@ -1,10 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.net.URL;
 import java.util.Vector;
 import java.io.IOException;
-import java.io.Serializable;
-import java.io.File;
 import java.util.*;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
@@ -41,7 +38,7 @@ public class search {
     private HTree webbody_table;
     private boolean tableExist = true;
 
-    query() throws IOException {
+    void query() throws IOException {
         id_to_web_table = getDB(recordmanager, id_to_web);
         url_to_web_table = getDB(recordmanager, url_to_web);
         word_to_id_table = getDB(recordmanager, word_to_id);
