@@ -46,6 +46,7 @@ public  class web implements Serializable {
 
 
 
+
         //this.score=new HashMap<>();
 
         /** indexer */
