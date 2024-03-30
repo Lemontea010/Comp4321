@@ -21,9 +21,9 @@ public class search {
     private ArrayList<String> keywordInput;
     private HashMap<Integer, String> foundWordId;
     private HashMap<Integer, HashMap<Integer,Integer> > outputTable;
-    private LinkedHashMap<Integer, Web> foundWeb;
+    private LinkedHashMap<Integer, web> foundWeb;
     private RecordManager recman;
-    private String recordmanager = "database";
+    private String recordmanager = "Spider";
 
     //total 5 table to be opened
     private String id_to_web = "id_to_web";               //<int doc_id ,web web>
@@ -38,13 +38,32 @@ public class search {
     private HTree webbody_table;
     private boolean tableExist = true;
 
-    void query() throws IOException {
+    public search(){
+        System.out.println("construct search object");
+    }
+
+    public void query() throws IOException {
+        System.out.println("try to get data");
+        recman = RecordManagerFactory.createRecordManager(recordmanager);
         id_to_web_table = getDB(recordmanager, id_to_web);
         url_to_web_table = getDB(recordmanager, url_to_web);
         word_to_id_table = getDB(recordmanager, word_to_id);
         webtitle_table = getDB(recordmanager, webtitle);
         webbody_table = getDB(recordmanager, webbody);
 
+        System.out.println("get data finished");
+
+        recman.commit();
+
+        FastIterator iter = word_to_id_table.keys();
+        String word = (String) iter.next();
+        while ( word != null ) {
+            int id = (Integer) word_to_id_table.get(word);
+            System.out.println(id);
+            System.out.println(" are ");
+            System.out.println(word );
+            word = (String) iter.next();
+        }
         if(tableExist){
             readUserInput();
             filterWordId();
@@ -52,13 +71,15 @@ public class search {
             //systemPrint();
             writeFile();
         }
+        recman.close();
     }
 
 
     //get htree for all five database, stop all process if the table not exist
-    public Htree getDB(String recordmanager, String tablename) throws IOException {
-        recman = RecordManagerFactory.createRecordManager(recordmanager);
+    public HTree getDB(String recordmanager, String tablename) throws IOException {
         long tableid = recman.getNamedObject(tablename);
+        System.out.println(tableid);
+
 
         if (tableid != 0) {
             return HTree.load(recman, tableid);
@@ -80,18 +101,23 @@ public class search {
         keywordInput = new ArrayList<>();
         for (String keyword : keywordsArray) {
             keywordInput.add(keyword);
+            System.out.println(keyword);
         }
         scanner.close();
     }
 
     //loop through the user input, get id from word_to_id database, save all the id into foundWordId
-    public void filterWordId(){
+    public void filterWordId() throws IOException {
         foundWordId = new HashMap<Integer, String>();
         int temp;
 
         for (int i=0;i<keywordInput.size();i++){
-            temp = word_to_id_table.get(keywordInput.get(i));
-            foundWordId.put(temp, keywordInput.get(i));
+            if (word_to_id_table.get(keywordInput.get(i))!=null){
+                temp = (int) word_to_id_table.get(keywordInput.get(i));
+                foundWordId.put(temp, keywordInput.get(i));
+            } else {
+                System.out.println("keyword" + keywordInput.get(i) + "does not exist in the table");
+            }
         }
     }
 
@@ -100,13 +126,13 @@ public class search {
     //outputTable -> <word_id, <doc_id, freq>>
     //foundWeb -> <doc_id, web object>
     //foundWordId -> <word_id, string>
-    public void filterWeb(){
+    public void filterWeb() throws IOException {
         outputTable = new HashMap<Integer, HashMap<Integer, Integer>>();
-        foundWeb = new LinkedHashMap<Integer, Web>();
+        foundWeb = new LinkedHashMap<Integer, web>();
 
         for (Map.Entry<Integer, String> set :foundWordId.entrySet()) {
             if(webbody_table.get(set.getKey())!=null){
-                outputTable.put(set.getKey(), webbody_table.get(set.getKey()));
+                outputTable.put(set.getKey(), (HashMap<Integer, Integer>) webbody_table.get(set.getKey()));
             }
         }
 
@@ -114,7 +140,11 @@ public class search {
         outputTable.forEach((key, value) -> {
             value.forEach((doc, freq) -> {
                 if(!foundWeb.containsKey(doc)) {
-                    foundWeb.put(doc, id_to_web_table.get(doc));
+                    try {
+                        foundWeb.put(doc, (web) id_to_web_table.get(doc));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         });
@@ -122,52 +152,64 @@ public class search {
 
 
     //    page title
-//    URL
-//    date, page size
-//    keyword1 freq; keyword2 freq;
-//    child link1
-//    child link2
-//    -------------------------------------
+    //    URL
+    //    date, page size
+    //    keyword1 freq; keyword2 freq;
+    //    child link1
+    //    child link2
+    //    -------------------------------------
     public void writeFile() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("spider_result.txt"))) {
-            for (Map.Entry<Integer, Web> entry : foundWeb.entrySet()) {
-                writer.write(entry.getValue().getCompletetitle());
-                writer.newLine();
-                writer.write(entry.getValue().getUrl());
-                writer.newLine();
-                writer.write(String.valueOf(entry.getValue().getLastmodified_date()));
-                writer.write(", ");
-                writer.write(String.valueOf(entry.getValue().getsize()));
-                writer.newLine();
+            for (Map.Entry<Integer, web> entry : foundWeb.entrySet()) {
+                if(entry!=null&&entry.getValue()!=null){
+                    writer.write(entry.getValue().getCompletetitle());
+                    writer.newLine();
+                    writer.write(entry.getValue().getUrl());
+                    writer.newLine();
+                    writer.write(String.valueOf(entry.getValue().getLastmodified_date()));
+                    writer.write(", ");
+                    writer.write(String.valueOf(entry.getValue().getsize()));
+                    writer.newLine();
 
-                //print the keyword and freq, according to user input order
 
-                //未排好序, 要將keyword input + keyword id 合拼做一個hashmap
-                //child link未output
+                    //print the keyword and freq, according to user input order
 
-                //iterate required word id
-                foundWordId.forEach((word_id, wordString) -> {
-                    //iterate web list
-                    outputTable.forEach((key,value) -> {
-                        //get freq for each word
-                        value.forEach((doc_id,freq) -> {
-                            //print the required freq if the doc_id match current web entry id
-                            if(entry.getKey() == doc_id){
-                                writer.write(wordString);
-                                writer.write("freq" + String.valueOf(freq) + " ");
-                            }
+                    //iterate required word id
+                    foundWordId.forEach((word_id, wordString) -> {
+                        //iterate web list
+                        outputTable.forEach((key,value) -> {
+                            //get freq for each word
+                            value.forEach((doc_id,freq) -> {
+                                //print the required freq if the doc_id match current web entry id
+                                if(entry.getKey() == doc_id){
+                                    try {
+                                        writer.write(wordString);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    try {
+                                        writer.write(" freq" + String.valueOf(freq) + " ");
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            });
                         });
                     });
-                });
-                writer.newLine();
+                    writer.newLine();
 
-                //print child link
-                private Vector<String> child_urls;
-                child_urls = entry.getValue().getChild();
-                for (Integer i = 0; i < child_urls.size(); i++){
-                    writer.write(child_urls.get(i));
+                    //print child link, null pointer check
+                    Vector<String> child_urls = entry.getValue().getChild();
+                    if (child_urls != null) {
+                        for (Integer i = 0; i < child_urls.size(); i++){
+                            writer.write(child_urls.get(i));
+                            writer.newLine();
+                        }
+                    } else {
+                        System.out.println("null pointer in child link.");
+                    }
+                    writer.write("-----------------------------------");
                 }
-                writer.write("-----------------------------------");
             }
             System.out.println("Data written to spider_result.txt successfully.");
         } catch (IOException e) {

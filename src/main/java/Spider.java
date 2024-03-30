@@ -41,7 +41,10 @@ public class Spider {
         num_urls = 0;
         db = RecordManagerFactory.createRecordManager("Spider");
         urls = HTree.createInstance(db);
+        System.out.println("urls.getRecid() is " + urls.getRecid());
         db.setNamedObject("url_to_web",urls.getRecid());
+        long tableid = db.getNamedObject("url_to_web");
+        System.out.println("new id is " + tableid);
 
         url_to_id= HTree.createInstance(db);
         db.setNamedObject("id_to_web",url_to_id.getRecid());
