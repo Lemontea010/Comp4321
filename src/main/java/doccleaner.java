@@ -40,7 +40,9 @@ public class doccleaner {
         Vector<String> cleancontent = new Vector<>();
         for(String element : content.toArray(new String[0])){
             if(!stopWords.contains(element)){
-                cleancontent.add(porter.stripAffixes(element));
+                if(element != null && porter.stripAffixes(element) != ""){
+                    cleancontent.add(porter.stripAffixes(element));
+                }
             }
         }
         return cleancontent;
