@@ -39,8 +39,16 @@ public  class web implements Serializable {
 
         /** creating a cleaned content */
         this.size = doccleaner.getsize(this.url);
+        this.title=doccleaner.titleprocessing(_url);
+        this.body=doccleaner.bodyprocessing(_url);
         this.completetitle = doccleaner.gettitle(this.url);
         this.lastmodified_date=doccleaner.get_lastmodified(this.url);
+        /*for(int i=0;i<body.size();i++){
+            System.out.println(body.get(i)+"\n");
+        }
+        for(int i=0;i<title.size();i++){
+            System.out.println(title.get(i)+"\n");
+        }*/
 
 
 
@@ -100,6 +108,12 @@ public  class web implements Serializable {
 
     public long getLastmodified_date(){
         return lastmodified_date;
+    }
+    public Vector<String> getTitle(){
+        return title;
+    }
+    public Vector<String> getBody(){
+        return body;
     }
 
 }

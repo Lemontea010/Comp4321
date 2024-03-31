@@ -4,7 +4,14 @@ import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
 import org.htmlparser.util.ParserException;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Phaser;
@@ -31,7 +38,7 @@ public class Spider {
      * @throws ParserException
      */
     Spider(String _url) throws ParserException, IOException {
-        num_urls = 1;
+        num_urls = 0;
         db = RecordManagerFactory.createRecordManager("Spider");
         urls = HTree.createInstance(db);
         db.setNamedObject("url_to_web",urls.getRecid());
@@ -126,29 +133,58 @@ public class Spider {
         try
         {
             Spider spider =new Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
+
+            String var10000 = System.getProperty("user.dir");
+            String pa = var10000 + File.separator + "Url_to_id.txt";
+            Path path = Paths.get(pa);
+            if (Files.exists(path, new LinkOption[0])) {
+                (new File(pa)).delete();
+            }
+            File f = new File(pa);
+            FileWriter file = new FileWriter(f);
+            BufferedWriter output = new BufferedWriter(file);
+            output.write("Id\t\t<==>\t\tUrl\n");
+
             RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
+
+           
+
             long recid = recman.getNamedObject("id_to_web");
             HTree hashtable = HTree.load(recman, recid);
             FastIterator key=hashtable.keys();
             web x;
 
-            for(int i=1;i<=300;i++){
+            for(int i=0;i<30;i++){
                 x=(web)hashtable.get(i);
 
                     while(x!=null) {
-                        System.out.println("url : " + x.getUrl() + " id : " + x.getid());
+                        output.write("id : "+x.getid()+"\t\t\turl : "+x.getUrl()+"\n");
                         i++;
                         x=(web)hashtable.get(i);
                     }
 
             }
+            output.close();
+
+            pa = var10000 + File.separator + "word_to_id.txt";
+            path = Paths.get(pa);
+            file = new FileWriter(new File(pa));
+            output = new BufferedWriter(file);
+            if (Files.exists(path, new LinkOption[0])) {
+                (new File(pa)).delete();
+            }
+            output.write("id\t\t\t<==>\t\t\tword\n");
             recid = recman.getNamedObject("Htree_word_to_id");
             HTree hashtable1=HTree.load(recman, recid);
             key=hashtable1.keys();
             String word;
             while((word=(String)key.next())!=null){
-                System.out.println("Word : "+word+" id : "+hashtable1.get(word));
+
+                output.write("id : "+hashtable1.get(word)+"\t\tword : "+word+"\n");
         }
+            output.close();
+
+
 
         }
         catch(IOException ex)
