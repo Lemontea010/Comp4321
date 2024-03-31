@@ -5,10 +5,8 @@ Teammate :
 3. Lau Man Tik
 
 Phrase 1 test program procedure:
-Step 1: Run the spider in program spider.java
-        (collecting information from the web and store into database)
-Step 2: Run test program in program Test.java
-        (write the required information into txt file)
+Step 1: Run the spider in program spider.java (collecting information from the web and store into database)
+Step 2: Run test program in program Test.java (write the required information into txt file)
 
 # Required information demostrated
 1. spider_result.txt : the information contained in each web
