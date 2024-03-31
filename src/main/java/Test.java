@@ -66,12 +66,16 @@ public class Test {
                 }
                 Iterator<String> iter =word.keySet().iterator();
                 String next;
-                while((iter.hasNext())){
+                int count =0;
+                while((iter.hasNext())&&count<10){
                     next=iter.next();
                     output.write(next+" " +word.get(next)+"; ");
+                    count++;
+
                 }
                 output.write("\n");
-                for(int j=0;j<x.getChild().size();j++){
+
+                for(int j=0;j<x.getChild().size()&&j<10;j++){
                     output.write(x.getChild().get(j)+"\n");
                 }
                 output.write("-----------------------------------------------------------------------------------------------------------\n");
