@@ -28,7 +28,7 @@ public class Spider {
 
     private Indexer indexer;
 
-    private final int limit=300;
+    private final int limit=30;
 
 
 
