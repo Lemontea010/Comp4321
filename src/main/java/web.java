@@ -43,7 +43,12 @@ public  class web implements Serializable {
         this.body=doccleaner.bodyprocessing(_url);
         this.completetitle = doccleaner.gettitle(this.url);
         this.lastmodified_date=doccleaner.get_lastmodified(this.url);
-
+        /*for(int i=0;i<body.size();i++){
+            System.out.println(body.get(i)+"\n");
+        }
+        for(int i=0;i<title.size();i++){
+            System.out.println(title.get(i)+"\n");
+        }*/
 
 
 
