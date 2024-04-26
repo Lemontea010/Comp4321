@@ -15,6 +15,7 @@ public class Search {
     HTree hashforbody;
     HTree word_to_id;
     HTree hashtable;
+    int totaldoc;
 
     public Search(String query) throws IOException {
         this.query = query;
@@ -28,19 +29,12 @@ public class Search {
         hashforbody = HTree.load(recman, recidofbody); //<int word_id,<int doc_id,int freq>>
         long recidofwid = recman.getNamedObject("Htree_word_to_id");
         word_to_id = HTree.load(recman, recidofwid); //<String word , int id>
-        System.out.println("Checkpoint for constructing Search instance");
-        /** all database Htree found */
-        if (recid == 0){
-            System.out.println("recid");
-        }
-        if (recidoftitle == 0){
-            System.out.println("recidoftitle");
-        }
-        if (recidofbody == 0){
-            System.out.println("recidofbody");
-        }
-        if (recidofwid == 0){
-            System.out.println("recidofwid");
+
+        totaldoc = 0;
+        FastIterator iter = hashtable.keys();
+        while( (iter.next())!=null)
+        {
+            totaldoc++;
         }
     }
 
@@ -68,14 +62,13 @@ public class Search {
     public Hashtable<web, Double> searchresult() throws ParserException, IOException {
         Hashtable<web, Double> result = new Hashtable<>();
         Vector<String> keyword = stemmingquery(this.query);
-        // Scoring each web and sort them out
         for (String word : keyword){
             if (this.word_to_id.get(word)!=null){
                 int wordid = (int)this.word_to_id.get(word);
                 /** title */
                 if (this.hashfortitle.get(wordid)!=null){
                     HashMap<Integer,Integer> map = (HashMap<Integer,Integer>)this.hashfortitle.get(wordid);
-                    int idf = map.size(); /** Todo : total doc */
+                    double idf = Math.log10((double) totaldoc/map.size())/Math.log(2);
                     for (int docid : map.keySet()){
                         int tf = map.get(docid);
                         web thisweb = (web)hashtable.get(docid);
@@ -91,7 +84,7 @@ public class Search {
                 /** body */
                 if (this.hashforbody.get(wordid)!=null){
                     HashMap<Integer,Integer> map = (HashMap<Integer,Integer>)this.hashforbody.get(wordid);
-                    int idf = map.size(); /** Todo : total doc */
+                    double idf = Math.log10((double) totaldoc/map.size())/Math.log(2);
                     for (int docid : map.keySet()){
                         int tf = map.get(docid);
                         web thisweb = (web)hashtable.get(docid);
@@ -106,10 +99,7 @@ public class Search {
                 }
             }
         }
-        /* sorting the hashtable */
-
         return result;
-        // result is sorted in order as relevance
     }
 
 
@@ -134,9 +124,12 @@ public class Search {
                 else {
                     System.out.println("Search result with stemmed enter : "+ result.getstemmedquery());
                 }
-                while (keys.hasMoreElements()) {
-                    web key = keys.nextElement();
-                    System.out.println(key.getCompletetitle()+" score: "+searchresult.get(key));
+                List<Map.Entry<web, Double>> entryList = new ArrayList<>(searchresult.entrySet());
+                Collections.sort(entryList, Map.Entry.comparingByValue());
+                Collections.reverse(entryList);
+                for (Map.Entry<web, Double> entry : entryList){
+                    /** entry.getKey() is web instance */
+                    System.out.println(entry.getKey().getCompletetitle()+" score: "+searchresult.get(entry.getKey()));
                 }
             } catch (ParserException e) {
                 throw new RuntimeException(e);
