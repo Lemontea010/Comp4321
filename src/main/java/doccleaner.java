@@ -84,6 +84,23 @@ public class doccleaner {
         return cleanbody;
     }
 
+    public static Vector<String> queryprocessing(String content) throws ParserException, IOException {
+        doccleaner dr = new doccleaner("stopwords.txt");
+
+        String query = content;
+        String[] tokens = query.split("[ ,?]+");
+        Vector<String> vec_tokens = new Vector<>();
+        for(int i=0; i< tokens.length; i++){
+            vec_tokens.add(tokens[i]);
+        }
+
+        /** remove stopword and stemming */
+        Vector<String> cleanquery = dr.stopstem(vec_tokens);
+
+        return cleanquery;
+    }
+
+
     public static String gettitle(String url)throws IOException {
         Crawler cr = new Crawler(url);
         String title = cr.extractContent().get(0);
