@@ -38,7 +38,7 @@ public class Search {
         }
     }
 
-    private Vector<String> stemmingquery(String query) throws ParserException, IOException {
+    private Vector<String> stemmingquery(String query) {
         /** Stem and remove stop-words of the query  */
         /** return the stemmed word in the form of string vector */
         return doccleaner.queryprocessing(query);
@@ -47,14 +47,16 @@ public class Search {
     public String getstemmedquery() throws ParserException, IOException {
         /** get the complete stemmed query as a sentence */
         StringBuilder builder = new StringBuilder();
-        for (String element : stemmingquery(this.query)) {
+        Vector<String> queryitem = stemmingquery(this.query);
+        queryitem.addAll(doccleaner.bigramprocessing(this.query));
+        for (String element : queryitem) {
             if (element != null){
                 builder.append(element);
                 builder.append(" "); // Add delimiter if desired
             }
         }
         if (!builder.isEmpty()) {
-            builder.delete(builder.length() - 2, builder.length()); // Remove trailing delimiter
+            builder.delete(builder.length() - 1, builder.length()); // Remove trailing delimiter
         }
         return builder.toString();
     }
@@ -62,6 +64,9 @@ public class Search {
     public Hashtable<web, Double> searchresult() throws ParserException, IOException {
         Hashtable<web, Double> result = new Hashtable<>();
         Vector<String> keyword = stemmingquery(this.query);
+        /** combine single item and bigram item */
+        keyword.addAll(doccleaner.bigramprocessing(this.query));
+
         for (String word : keyword){
             if (this.word_to_id.get(word)!=null){
                 int wordid = (int)this.word_to_id.get(word);
@@ -113,13 +118,15 @@ public class Search {
             Search result = new Search(input);
             //get the displayed result
             System.out.println("User Entered: " + input);
+            if (input.isEmpty()){
+                continue;
+            }
             //output the results in the console
             /** iterate element in web result */
             try {
                 Hashtable<web, Double> searchresult = result.searchresult();
-                Enumeration<web> keys = searchresult.keys();
-                if (searchresult.isEmpty()){
-                    System.out.println("No result with stemmed entered : "+ result.getstemmedquery());
+                if (searchresult.isEmpty()) {
+                    System.out.println("No result with stemmed entered : " + result.getstemmedquery());
                 }
                 else {
                     System.out.println("Search result with stemmed enter : "+ result.getstemmedquery());
