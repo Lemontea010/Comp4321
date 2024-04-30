@@ -100,5 +100,10 @@ public class doccleaner {
         URLConnection connection =url.openConnection();
         return connection.getLastModified();
     }
+    public static long get_today_date(){
+        Date d =new Date();
+
+        return d.getTime();
+    }
 
 }

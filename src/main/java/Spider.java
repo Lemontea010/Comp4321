@@ -32,6 +32,38 @@ public class Spider {
 
 
 
+    Spider(RecordManager _db) throws IOException {
+        db = _db;
+        num_urls = 0;
+        long recid = db.getNamedObject("id_to_web");
+        if (recid != 0) {
+            url_to_id = HTree.load(db, recid);
+        }else{
+            urls = HTree.createInstance(db);
+
+        }
+        db.setNamedObject("url_to_web",urls.getRecid());
+        recid = db.getNamedObject("url_to_web");
+        if (recid != 0) {
+            urls = HTree.load(db, recid);
+            FastIterator it= urls.keys();
+
+            while(it.next()!=null){
+                num_urls++;
+            }
+        }else{
+            url_to_id= HTree.createInstance(db);
+
+        }
+        db.setNamedObject("id_to_web",url_to_id.getRecid());
+        indexer=new Indexer(db);
+        if(url_to_id.get(0)!=null){
+            this.get_url_recursive(((web)url_to_id.get(0)).getUrl());
+        }
+        db.commit();
+        db.close();
+    }
+
     /**
      *
      * @param _url
@@ -90,6 +122,15 @@ public class Spider {
                 return temp;
             }
             if(urls.get(_url)!=null){
+                web cur=(web)(urls.get(_url));
+                if(cur.getUpdate_date()>doccleaner.get_lastmodified(_url)){
+                    int id=cur.getid();
+                    urls.remove(_url);
+                    web a=new web(_url,id,temp);
+                    urls.put(_url,a);
+                    url_to_id.remove(id);
+                    url_to_id.put(id,a);
+                }
                 return temp;
             }else{
                 web a=new web(_url,num_urls,temp)   ;                        //if url not exist

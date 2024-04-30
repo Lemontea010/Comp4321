@@ -15,6 +15,7 @@ public  class web implements Serializable {
 
     private int size;
     private long lastmodified_date;
+    private long update_date;
     private Vector<String> child_urls;
     private Vector<String> parent_urls;
     private Vector<String> title;
@@ -43,6 +44,7 @@ public  class web implements Serializable {
         this.body=doccleaner.bodyprocessing(_url);
         this.completetitle = doccleaner.gettitle(this.url);
         this.lastmodified_date=doccleaner.get_lastmodified(this.url);
+        this.update_date=doccleaner.get_today_date();
         /*for(int i=0;i<body.size();i++){
             System.out.println(body.get(i)+"\n");
         }
@@ -115,6 +117,6 @@ public  class web implements Serializable {
     public Vector<String> getBody(){
         return body;
     }
-
+    public long getUpdate_date(){return update_date;}
 }
 
