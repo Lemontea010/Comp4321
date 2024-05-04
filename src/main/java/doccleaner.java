@@ -89,6 +89,7 @@ public class doccleaner {
     }
 
     /** mode : 0-> not filtering for query ; 1-> filtering for indexing*/
+    /** need to provide complete content */
     public static Vector<String> bigramprocessing(String content, int mode) {
 
         /** bigram construction */
@@ -124,7 +125,15 @@ public class doccleaner {
             /** perform PMI filtering */
             /** store individual item to hashmap */
             HashMap<String, Integer> freq = new HashMap<>();
-            for (String item : tokens) {
+            Vector<String> stem = new Vector<>();
+            for(String element : tokens){
+                if(!stopWords.contains(element)){
+                    if(element != null && porter.stripAffixes(element) != ""){
+                        stem.add(porter.stripAffixes(element));
+                    }
+                }
+            }
+            for (String item : stem) {
                 if (freq.get(item) == null) {
                     freq.put(item, 1);
                 } else {

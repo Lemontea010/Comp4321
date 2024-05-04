@@ -36,11 +36,11 @@ public class Crawler {
 
         // Extract the title
         String title = doc.title();
-        titleandcontent.add(title);
+        titleandcontent.add(title); /** titleandcontent[0] -> title */
         // Extract the body
         Element bodyElement = doc.body();
         String body = bodyElement.text();
-        titleandcontent.add(body);
+        titleandcontent.add(body); /** titleandcontent[1] -> body */
 
         return titleandcontent;
     }
