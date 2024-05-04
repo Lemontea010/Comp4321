@@ -10,8 +10,8 @@ import java.util.*;
 
 public class doccleaner {
 
-    private Porter porter;
-    private HashSet<String> stopWords;
+    private static Porter porter;
+    private static HashSet<String> stopWords;
 
     public doccleaner(String str){
         super();
@@ -47,25 +47,6 @@ public class doccleaner {
         }
         return cleancontent;
     }
-
-    private Vector<String> stopstemforbigram (ArrayList<String[]> content){
-        Vector<String> cleancontent = new Vector<>();
-        for(String[] subset : content){
-            // if both element in the subset are not stopword
-            if (!stopWords.contains(subset[0])&&!stopWords.contains(subset[1])){
-                // if both element exist after stemming
-                if (subset[0]!= null && porter.stripAffixes(subset[0]) != ""){
-                    if (subset[1]!= null && porter.stripAffixes(subset[1]) != ""){
-                        // combine the element to stemmed and completed bigram item
-                        String bigramitem = porter.stripAffixes(subset[0]) + " " + porter.stripAffixes(subset[1]);
-                        cleancontent.add(bigramitem);
-                    }
-                }
-            }
-        }
-        return cleancontent;
-    }
-
 
     public static Vector<String> titleprocessing(String url) throws ParserException, IOException {
         Crawler cr = new Crawler(url);
@@ -107,20 +88,71 @@ public class doccleaner {
         return dr.stopstem(vec_tokens);
     }
 
-    public static Vector<String> bigramprocessing(String content){
-        doccleaner dr = new doccleaner("stopwords.txt");
+    /** mode : 0-> not filtering for query ; 1-> filtering for indexing*/
+    public static Vector<String> bigramprocessing(String content, int mode) {
 
         /** bigram construction */
         String[] tokens = content.split("[ ,?]+");
         ArrayList<String[]> bigramset = new ArrayList<>();
-        for(int i = 0; i< tokens.length-1 ; i++){
+        for (int i = 0; i < tokens.length - 1; i++) {
             String[] subset = new String[2];
             subset[0] = tokens[i];
-            subset[1] = tokens[i+1];
+            subset[1] = tokens[i + 1];
             bigramset.add(subset);
         }
         /** stemming and stopword removal */
-        return dr.stopstemforbigram(bigramset);
+        Vector<String> bicontent = new Vector<>();
+        Vector<String> pmifilter = new Vector<>();
+        for (String[] subset : bigramset) {
+            // if both element in the subset are not stopword
+            if (!stopWords.contains(subset[0]) && !stopWords.contains(subset[1])) {
+                // if both element exist after stemming
+                if (subset[0] != null && porter.stripAffixes(subset[0]) != "") {
+                    if (subset[1] != null && porter.stripAffixes(subset[1]) != "") {
+                        // combine the element to stemmed and completed bigram item
+                        String bigramitem = porter.stripAffixes(subset[0]) + "_" + porter.stripAffixes(subset[1]);
+                        bicontent.add(bigramitem);
+                    }
+                }
+            }
+        }
+        /** if mode = 1 perform pmi filtering , else simply return all bigram */
+        if (mode != 1) {
+            return bicontent;
+        }
+        else {
+            /** perform PMI filtering */
+            /** store individual item to hashmap */
+            HashMap<String, Integer> freq = new HashMap<>();
+            for (String item : tokens) {
+                if (freq.get(item) == null) {
+                    freq.put(item, 1);
+                } else {
+                    int f = freq.get(item);
+                    freq.put(item, f + 1);
+                }
+            }
+            /** store bigram item to hashmap */
+            for (String biitem : bicontent) {
+                if (freq.get(biitem) == null) {
+                    freq.put(biitem, 1);
+                } else {
+                    int f = freq.get(biitem);
+                    freq.put(biitem, f + 1);
+                }
+            }
+            for (String biitem : bicontent){
+                String[] subpart = biitem.split("_");
+                String item1 = subpart[0];
+                String item2 = subpart[1];
+                double pmi = Math.log10((double) (freq.get(biitem) * tokens.length) /(freq.get(item1)*freq.get(item2)))/Math.log(2);
+                if (Math.abs(pmi)>3){
+                    /** return meaning phrase */
+                    pmifilter.add(biitem);
+                }
+            }
+        }
+        return pmifilter;
     }
 
 
