@@ -48,7 +48,6 @@ public class Search {
         /** get the complete stemmed query as a sentence */
         StringBuilder builder = new StringBuilder();
         Vector<String> queryitem = stemmingquery(this.query);
-        queryitem.addAll(doccleaner.bigramprocessing(this.query, 0));
         for (String element : queryitem) {
             if (element != null){
                 builder.append(element);
@@ -104,8 +103,6 @@ public class Search {
         ArrayList<web> result = new ArrayList<>();
 
         /** combine single item and bigram item */
-        Vector<String> keyword = stemmingquery(this.query);
-        keyword.addAll(doccleaner.bigramprocessing(this.query,0));
 
         //iterate all web and compute cosine similarity
         int key = 1;
