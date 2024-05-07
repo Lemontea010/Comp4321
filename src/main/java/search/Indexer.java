@@ -1,4 +1,7 @@
+package search;
+
 import jdbm.RecordManager;
+import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
 
 import java.io.IOException;
@@ -18,12 +21,39 @@ public class Indexer {
     public Indexer(RecordManager db) throws IOException {
 
         hashfortitle=HTree.createInstance(db);
-        db.setNamedObject("Htree_title",hashfortitle.getRecid());
-        hashforbody=HTree.createInstance(db);
-        db.setNamedObject("Htree_body",hashforbody.getRecid());
-        word_to_id=HTree.createInstance(db);
-        db.setNamedObject("Htree_word_to_id",word_to_id.getRecid());
+
         num_of_word=0;
+        long recid = db.getNamedObject("Htree_title");
+        if (recid != 0) {
+            hashfortitle = HTree.load(db, recid);
+        }else {
+            hashfortitle = HTree.createInstance(db);
+            db.setNamedObject("Htree_title", hashfortitle.getRecid());
+        }
+
+
+        recid = db.getNamedObject("Htree_body");
+        if (recid != 0) {
+            hashforbody = HTree.load(db, recid);
+        }else {
+            hashforbody = HTree.createInstance(db);
+            db.setNamedObject("Htree_body", hashforbody.getRecid());
+        }
+
+
+
+        recid = db.getNamedObject("Htree_word_to_id");
+        if (recid != 0) {
+            word_to_id = HTree.load(db, recid);
+            FastIterator it= word_to_id.keys();
+
+            while(it.next()!=null){
+                num_of_word++;
+            }
+        }else {
+            word_to_id = HTree.createInstance(db);
+            db.setNamedObject("Htree_word_to_id", word_to_id.getRecid());
+        }
 
 
 
@@ -61,7 +91,7 @@ public class Indexer {
             else {                                  //if the word exist in the body
                 temp = (HashMap<Integer,Integer>)hashforbody.get(x);
                 int entry;
-                if(temp.get(id)==null){             // if the web does not exist in the file
+                if(temp.get(id)==null){             // if the search.web does not exist in the file
                     entry=1;                        //entry =1
                 }
                 else{
@@ -94,7 +124,7 @@ public class Indexer {
             else {                                  //if the word exist in the body
                 temp = (HashMap<Integer,Integer>)hashfortitle.get(x);
                 int entry;
-                if (temp.get(id) == null) {             // if the web does not exist in the file
+                if (temp.get(id) == null) {             // if the search.web does not exist in the file
                     entry = 1;                        //entry =1
                 } else {
                     entry = temp.get(id) + 1;           //entry = original count +1

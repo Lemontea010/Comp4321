@@ -1,6 +1,7 @@
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 import jdbm.htree.HTree;
+import search.web;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,11 +15,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-
+import search.*;
 public class Test {
     public static void main(String[] args) throws IOException {
 
-        RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
+        RecordManager recman = RecordManagerFactory.createRecordManager("search.Spider");
 
 
 

@@ -1,3 +1,5 @@
+package search;
+
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 import jdbm.helper.FastIterator;
@@ -20,7 +22,7 @@ public class Search {
     public Search(String query) throws IOException {
         this.query = query;
 
-        RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
+        RecordManager recman = RecordManagerFactory.createRecordManager("search.Spider");
         long recid = recman.getNamedObject("id_to_web");
         hashtable = HTree.load(recman, recid);
         long recidoftitle = recman.getNamedObject("Htree_title");
@@ -122,20 +124,20 @@ public class Search {
                 continue;
             }
             //output the results in the console
-            /** iterate element in web result */
+            /** iterate element in search.web result */
             try {
                 Hashtable<web, Double> searchresult = result.searchresult();
                 if (searchresult.isEmpty()) {
                     System.out.println("No result with stemmed entered : " + result.getstemmedquery());
                 }
                 else {
-                    System.out.println("Search result with stemmed enter : "+ result.getstemmedquery());
+                    System.out.println("search.Search result with stemmed enter : "+ result.getstemmedquery());
                 }
                 List<Map.Entry<web, Double>> entryList = new ArrayList<>(searchresult.entrySet());
                 Collections.sort(entryList, Map.Entry.comparingByValue());
                 Collections.reverse(entryList);
                 for (Map.Entry<web, Double> entry : entryList){
-                    /** entry.getKey() is web instance */
+                    /** entry.getKey() is search.web instance */
                     System.out.println(entry.getKey().getCompletetitle()+" score: "+searchresult.get(entry.getKey()));
                 }
             } catch (ParserException e) {

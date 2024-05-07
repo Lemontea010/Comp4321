@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>COMP4321G41 WEB SEARCH</title>
+
+
+</head>
+<script>
+function validateForm() {
+  var x = document.forms["input"]["query"].value;
+  if (x == "" || x == null) {
+    return false;
+  }
+}
+</script>
+<body>
+<form name="input" method="post" action="search.jsp" onsubmit="return validateForm()" required>
+    Please key in a list of word:<br>
+    <input type="text" name="query" size="70" placeholder="Type your query here">
+    <input type="submit" value="Enter">
+</form>
+
+
+</body>
+</html>
