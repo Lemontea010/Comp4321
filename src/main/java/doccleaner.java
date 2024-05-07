@@ -79,14 +79,57 @@ public class doccleaner {
     /** todo : "Hong Kong University" of Science and Technology "*/
     public static Vector<String> queryprocessing(String content) {
         doccleaner dr = new doccleaner("stopwords.txt");
-
-        /** split out phrase and not phrase here */
+        /** remove stopword and stemming */
         String[] tokens = content.split("[ ,?]+");
         Vector<String> vec_tokens = new Vector<>(Arrays.asList(tokens));
-
-        /** remove stopword and stemming */
-
-        return dr.stopstem(vec_tokens);
+        Vector<String> stemquery = dr.stopstem(vec_tokens);
+        /** adding phrase */
+        ArrayList<String[]> bigramset = new ArrayList<>();
+        for (int i = 0; i < tokens.length - 1; i++) {
+            String[] subset = new String[2];
+            subset[0] = tokens[i];
+            subset[1] = tokens[i + 1];
+            bigramset.add(subset);
+        }
+        /** trigram construction */
+        ArrayList<String[]> trigramset = new ArrayList<>();
+        for (int i = 0; i < tokens.length - 2; i++) {
+            String[] subset = new String[3];
+            subset[0] = tokens[i];
+            subset[1] = tokens[i + 1];
+            subset[2] = tokens[i + 2];
+            trigramset.add(subset);
+        }
+        for (String[] subset : bigramset) {
+            // if both element in the subset are not stopword
+            if (!stopWords.contains(subset[0]) && !stopWords.contains(subset[1])) {
+                // if both element exist after stemming
+                if (subset[0] != null && porter.stripAffixes(subset[0]) != "") {
+                    if (subset[1] != null && porter.stripAffixes(subset[1]) != "") {
+                        // combine the element to stemmed and completed bigram item
+                        String bigramitem = porter.stripAffixes(subset[0]) + "_" + porter.stripAffixes(subset[1]);
+                        stemquery.add(bigramitem);
+                    }
+                }
+            }
+        }
+        for (String[] subset : trigramset) {
+            // if both element in the subset are not stopword
+            if (!stopWords.contains(subset[0]) && !stopWords.contains(subset[1])&&!stopWords.contains(subset[2])) {
+                // if both element exist after stemming
+                if (subset[0] != null && porter.stripAffixes(subset[0]) != "") {
+                    if (subset[1] != null && porter.stripAffixes(subset[1]) != "") {
+                        if (subset[2] != null && porter.stripAffixes(subset[2]) != "") {
+                            // combine the element to stemmed and completed bigram item
+                            String trigramitem = porter.stripAffixes(subset[0]) + "_" + porter.stripAffixes(subset[1]) + "_" + porter.stripAffixes(subset[2]);
+                            stemquery.add(trigramitem);
+                        }
+                    }
+                }
+            }
+        }
+        return stemquery;
+        /** stemquery = stemmed individual word + stemmed bigrams + stemmed trigrams */
     }
 
     /** mode : 0-> not filtering for query ; 1-> filtering for indexing*/
