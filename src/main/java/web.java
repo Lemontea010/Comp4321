@@ -45,6 +45,9 @@ public  class web implements Serializable {
         this.hashbody = new HashMap<>();
         wordstore(this.title, "title");
         wordstore(this.body, "body");
+        Crawler cr = new Crawler(this.url);
+        wordstore(doccleaner.bigramprocessing(cr.extractContent().get(0)),"title");
+        wordstore(doccleaner.bigramprocessing(cr.extractContent().get(1)),"body");
         /*for(int i=0;i<body.size();i++){
             System.out.println(body.get(i)+"\n");
         }
