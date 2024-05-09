@@ -138,4 +138,16 @@ public class Indexer {
     public int getNum_of_word() {
         return num_of_word;
     }
+
+    public HTree getHashforbody() {
+        return hashforbody;
+    }
+
+    public HTree getHashfortitle() {
+        return hashfortitle;
+    }
+
+    public HTree getWord_to_id() {
+        return word_to_id;
+    }
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.htmlparser.util.ParserException;
-import search.doccleaner;
 
 import java.io.IOException;
 

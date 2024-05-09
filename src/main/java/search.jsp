@@ -1,8 +1,8 @@
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,jdbc.*"%>
 <%@ page import="java.lang.*"%>
-
-<%@ page import="search.*" %>
-
+<%@ page import="java.io.*" %>
+<%@ page import="search.web" %>
+<%@ page import="search.Search" %>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -81,13 +81,35 @@
     %>
 <form method="post" >
     Search Result:<br>
-    <input type="text" name="query" size="70" value=<%request.getParameter("query");%>>
+    <input type="text" name="query" size="70" value=<%=request.getParameter("query")%>>
     <input type="submit" value="Enter">
+</form>
+<br>
+
+
+
 <%
 if(request.getParameter("query")!="")
 {
 	String query= request.getParameter("query");
-	out.println(query);
+	        Search search = new Search(query);
+            List<web>result=search.searchresult();
+    	    for(int i=0;i<50&&i<result.size();i++){
+    	        web cur_web=result.get(i);
+    	        if(cur_web.getScore()==0){
+    	            out.println("No more relevant webpage.");
+    	            break;
+    	        }
+                out.println(cur_web.getScore()+"Title:"+"<a href="+cur_web.getUrl()+">"+cur_web.getCompletetitle()+"</a><br>");
+                out.println("Urls"+"<a href="+cur_web.getUrl()+">"+cur_web.getUrl()+"</a><br>");
+                Date date = new Date(cur_web.getLastmodified_date());
+                out.println("    "+"Last Modified Date : "+date+" , Size : "+cur_web.getsize()+"B<br>");
+                out.println(print_word(cur_web));
+                out.println(print_link(cur_web.getParent()));
+                out.println(print_link(cur_web.getChild()));
+                out.println("<br><br>");
+    	    }
+
 }
 else
 {
@@ -95,25 +117,13 @@ else
 }
 
 %>
-	<%--
-        Search search = new search(query);
-        List<web>result=search.searchresult();
-	    for(int i=0;i<50&&i<result.size();i++){
-	        web cur_web=result.get(i);
-            out.println(cur_web.getScore()+"    "+"<a href="+cur_web.getUrl()+">"+cur_web.getCompletetitle()+"</a><br>");
-            out.println("    "+"<a href="+cur_web.getUrl()+">"+cur_web.getUrl()+"</a><br>");
-            Date date = new Date(cur_web.getLastmodified_date());
-            out.println("    "+"Last Modified Date : "+date+" , Size : "+cur_web.getsize()+"<br>");
-            print_word(cur_web);
-            print_link(cur_web.getParent());
-            print_link(cur_web.getChild());
-            out.println("<br><br>");
-	    }
 
 
 
 
-	--%>
+
+
+
 <hr>
 <%
 

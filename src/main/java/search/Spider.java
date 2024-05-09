@@ -23,42 +23,49 @@ public class Spider {
     private HTree url_to_id;                ///<int id ,search.web search.web>
 
     private int num_urls;   //total num = num_urls+1
+    private HashMap<Integer,Boolean> updated;
 
     private RecordManager db;
 
     private Indexer indexer;
 
-    private final int limit=30;
+    private final int limit=300;
 
 
     public Spider(RecordManager _db) throws IOException {
+        updated=new HashMap<>();
         db = _db;
         num_urls = 0;
-        long recid = db.getNamedObject("id_to_web");
+        long recid = _db.getNamedObject("id_to_web");
         if (recid != 0) {
-            url_to_id = HTree.load(db, recid);
+            url_to_id = HTree.load(_db, recid);
         }else{
-            urls = HTree.createInstance(db);
-
+            url_to_id = HTree.createInstance(db);
         }
-        db.setNamedObject("url_to_web",urls.getRecid());
-        recid = db.getNamedObject("url_to_web");
+        long recid2 = _db.getNamedObject("url_to_web");
         if (recid != 0) {
-            urls = HTree.load(db, recid);
+            urls = HTree.load(_db, recid);
             FastIterator it= urls.keys();
-
-            while(it.next()!=null){
+            String temp;
+            while((temp=(String)it.next())!=null){
+                updated.put(((web)urls.get(temp)).getid(),false);
                 num_urls++;
             }
         }else{
             url_to_id= HTree.createInstance(db);
+        }
 
-        }
-        db.setNamedObject("id_to_web",url_to_id.getRecid());
         indexer=new Indexer(db);
-        if(url_to_id.get(0)!=null){
-            this.get_url_recursive(((web)url_to_id.get(0)).getUrl());
+        if(url_to_id.get(0)!=null) {
+            this.get_url_recursive("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
+        }else{
+            System.out.println("An error has occured");
         }
+        db.update(recid,url_to_id);
+        db.update(recid2,urls);
+        db.update(_db.getNamedObject("Htree_title"),indexer.getHashfortitle());
+        db.update(_db.getNamedObject("Htree_body"),indexer.getHashforbody());
+        db.update(_db.getNamedObject("Htree_word_to_id"),indexer.getWord_to_id());
         db.commit();
         db.close();
     }
@@ -69,6 +76,7 @@ public class Spider {
      * @throws ParserException
      */
     public Spider(String _url) throws ParserException, IOException {
+        updated=new HashMap<>();
         num_urls = 0;
         db = RecordManagerFactory.createRecordManager("search.Spider");
         urls = HTree.createInstance(db);
@@ -79,30 +87,9 @@ public class Spider {
         indexer=new Indexer(db);
 
         this.get_url_recursive(_url);
-        /*FastIterator iter_web=urls.values();
-        Set<String> iter_word;
-        search.web w;
 
-        while((w=(search.web)iter_web.next())!=null){
+        //System.out.println(num_urls);
 
-            iter_word = w.getHashforbody().keySet();
-            Iterator<String> stringIterator=iter_word.iterator();
-            if(stringIterator.hasNext()) {
-                String word=stringIterator.next();
-
-            }
-
-        }
-        iter_web=urls.values();
-        while((w=(search.web)iter_web.next())!=null){
-            iter_word = w.getHashforbody().keySet();
-            Iterator<String> stringIterator=iter_word.iterator();
-            if(stringIterator.hasNext()) {
-                String word=stringIterator.next();
-                double score=(w.getHashforbody().get(word))/(w.getmax())*((Math.log(num_urls)/indexer.get_df(word))/Math.log(2));
-                w.update_score(word,score);
-            }
-        }*/
         db.commit();
         db.close();
     }
@@ -122,6 +109,9 @@ public class Spider {
             }
             if(urls.get(_url)!=null){
                 web cur=(web)(urls.get(_url));
+                if(updated.get(cur.getid())){
+                    return temp;                    //if already updated return
+                }
                 if(cur.getUpdate_date()<doccleaner.get_lastmodified(_url)){
                     int id=cur.getid();
                     urls.remove(_url);
@@ -129,8 +119,10 @@ public class Spider {
                     urls.put(_url,a);
                     url_to_id.remove(id);
                     url_to_id.put(id,a);
+                    //System.out.println(cur.getid());
                 }
-                return temp;
+                //System.out.println(cur.getid());
+                updated.replace(cur.getid(),true);
             }else{
                 web a=new web(_url,num_urls,temp)   ;                        //if url not exist
                 urls.put(_url,a);//create new search.web class
@@ -140,7 +132,9 @@ public class Spider {
                 title.addAll(doccleaner.bigramprocessing(crawler.extractContent().get(0))); //get bigram title
                 body.addAll(doccleaner.bigramprocessing(crawler.extractContent().get(1)));
                 indexer.put(title,body,num_urls);
+                updated.put(a.getid(),false);
                 num_urls +=1;
+
                 /*System.out.println(_url+"\n");
                 int x=((search.web)urls.get(_url)).getsize();
                 long y =((search.web)urls.get(_url)).getLastmodified_date();
@@ -176,7 +170,13 @@ public class Spider {
     {
         try
         {
-            Spider spider =new Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
+            RecordManager temp = RecordManagerFactory.createRecordManager("search.Spider");
+            long recid = temp.getNamedObject("id_to_web");
+            if (recid != 0) {
+                    Spider spider =new Spider(temp);
+            }else{
+                Spider spider =new Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
+            }
 
             String var10000 = System.getProperty("user.dir");
             String pa = var10000 + File.separator + "Url_to_id.txt";
@@ -189,11 +189,11 @@ public class Spider {
             BufferedWriter output = new BufferedWriter(file);
             output.write("Id\t\t<==>\t\tUrl\n");
 
-            RecordManager recman = RecordManagerFactory.createRecordManager("search.Spider");
 
+            RecordManager recman = RecordManagerFactory.createRecordManager("search.Spider");
            
 
-            long recid = recman.getNamedObject("id_to_web");
+            recid = recman.getNamedObject("id_to_web");
             HTree hashtable = HTree.load(recman, recid);
             FastIterator key=hashtable.keys();
             web x;
