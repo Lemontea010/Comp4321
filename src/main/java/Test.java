@@ -1,5 +1,6 @@
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
+import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
 import search.web;
 
@@ -76,8 +77,15 @@ public class Test {
                 }
                 output.write("\n");
 
-                for(int j=0;j<x.getChild().size()&&j<10;j++){
+                /*for(int j=0;j<x.getChild().size()&&j<5;j++){
                     output.write(x.getChild().get(j)+"\n");
+                }*/
+                /*recid = recman.getNamedObject("url_to_web");
+                HTree hashtable2 = HTree.load(recman, recid);
+                FastIterator _iter=hashtable2.keys()*/
+                for(int j=0;j<x.getParent().size()&&j<5;j++){
+
+                    output.write(x.getParent().get(j)+"\n");
                 }
                 output.write("-----------------------------------------------------------------------------------------------------------\n");
             }

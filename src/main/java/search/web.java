@@ -55,27 +55,7 @@ public  class web implements Serializable {
         Crawler cr = new Crawler(this.url);
         wordstore(doccleaner.bigramprocessing(cr.extractContent().get(0)),"title");
         wordstore(doccleaner.bigramprocessing(cr.extractContent().get(1)),"body");
-        /*for(int i=0;i<body.size();i++){
-            System.out.println(body.get(i)+"\n");
-        }
-        for(int i=0;i<title.size();i++){
-            System.out.println(title.get(i)+"\n");
-        }*/
 
-
-
-        //this.score=new HashMap<>();
-
-        /** indexer */
-
-        /*Iterator iter = hashforbody.keySet().iterator();
-        String x;
-        while(iter.hasNext()){
-            x=(String)iter.next();
-            if(hashforbody.get(x)>max_word){
-                max_word=hashforbody.get(x);
-            }
-        }*/
 
     }
     public String getUrl(){
@@ -105,12 +85,13 @@ public  class web implements Serializable {
     public boolean updateParent(String parent){
 
         //if this parent url is not in the parent vector add new vector
-        for(int i=0;i< parent_urls.size();i++){
-            if(parent_urls.get(i).equals(parent))
-                return true;
+        if(parent_urls.contains(parent)) {
+            return true;
         }
-        this.parent_urls.add(parent);
-        return false;
+        else {
+            this.parent_urls.add(parent);
+            return false;
+        }
     }
 
     public String getCompletetitle() {

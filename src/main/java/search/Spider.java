@@ -18,12 +18,12 @@ import java.util.*;
 
 
 public class Spider {
-    private HTree urls;                     //<String _url ,search.web search.web>
+    private static HTree urls;                     //<String _url ,search.web search.web>
 
-    private HTree url_to_id;                ///<int id ,search.web search.web>
+    private static HTree url_to_id;                ///<int id ,search.web search.web>
 
-    private int num_urls;   //total num = num_urls+1
-    private HashMap<Integer,Boolean> updated;
+    private static int num_urls;   //total num = num_urls+1
+    private static HashMap<Integer,Boolean> updated;
 
     private RecordManager db;
 
@@ -44,7 +44,7 @@ public class Spider {
         }
         long recid2 = _db.getNamedObject("url_to_web");
         if (recid != 0) {
-            urls = HTree.load(_db, recid);
+            urls = HTree.load(_db, recid2);
             FastIterator it= urls.keys();
             String temp;
             while((temp=(String)it.next())!=null){
@@ -61,6 +61,7 @@ public class Spider {
         }else{
             System.out.println("An error has occured");
         }
+
         db.update(recid,url_to_id);
         db.update(recid2,urls);
         db.update(_db.getNamedObject("Htree_title"),indexer.getHashfortitle());
@@ -87,8 +88,6 @@ public class Spider {
         indexer=new Indexer(db);
 
         this.get_url_recursive(_url);
-
-        //System.out.println(num_urls);
 
         db.commit();
         db.close();
@@ -122,6 +121,7 @@ public class Spider {
                     //System.out.println(cur.getid());
                 }
                 //System.out.println(cur.getid());
+
                 updated.replace(cur.getid(),true);
             }else{
                 web a=new web(_url,num_urls,temp)   ;                        //if url not exist
@@ -132,7 +132,7 @@ public class Spider {
                 title.addAll(doccleaner.bigramprocessing(crawler.extractContent().get(0))); //get bigram title
                 body.addAll(doccleaner.bigramprocessing(crawler.extractContent().get(1)));
                 indexer.put(title,body,num_urls);
-                updated.put(a.getid(),false);
+                updated.put(a.getid(),true);
                 num_urls +=1;
 
                 /*System.out.println(_url+"\n");
@@ -147,12 +147,24 @@ public class Spider {
 
             for(int i=0;i<temp.size();i++){
                 get_url_recursive(temp.get(i));
-                if(num_urls>=limit){
-                    break;
-                }
-                ((web)urls.get(temp.get(i))).updateParent(_url);
+                web child_web=(web)urls.get(temp.get(i));
+                child_web.updateParent(_url);
+                int id=child_web.getid();
+                urls.remove(child_web.getUrl());
+                urls.put(child_web.getUrl(),child_web);
+                url_to_id.remove(id);
+                url_to_id.put(id,child_web);
 
+                //System.out.println(_link+" : "+_id);
+               // System.out.println(((web)urls.get(temp.get(i))).getid()+" : "+id);
             }
+            /*web x=(web)urls.get(_url);
+            web y=(web)url_to_id.get(x.getid());
+            for(int j=0;j<x.getParent().size()&&j<5;j++){
+
+                System.out.println(x.getParent().get(j)+"\n");
+                System.out.println(y.getParent().get(j)+"\n\n");
+            }*/
             return temp;
         } catch (ParserException | IOException e) {
             e.printStackTrace();

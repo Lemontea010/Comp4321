@@ -8,6 +8,14 @@
     <meta charset="UTF-8">
     <title>COMP4321G41 WEB SEARCH</title>
 </head>
+<script>
+function validateForm() {
+  var x = document.forms["input"]["query"].value;
+  if (x == "" || x == null) {
+    return false;
+  }
+}
+</script>
 <body>
     <%!
         String print_word(web cur_web)
@@ -79,9 +87,18 @@
         }
 
     %>
-<form method="post" >
-    Search Result:<br>
-    <input type="text" name="query" size="70" value=<%=request.getParameter("query")%>>
+    Search Result of:
+    <%
+    if(request.getParameter("query")!="")
+    {
+    	String query= request.getParameter("query");
+    	out.println(query);
+
+    %>
+
+<form name="input" method="post" action="search.jsp" onsubmit="return validateForm()" required>
+
+    <input type="text" name="query" size="70" placeholder="Input new query here">
     <input type="submit" value="Enter">
 </form>
 <br>
@@ -89,9 +106,6 @@
 
 
 <%
-if(request.getParameter("query")!="")
-{
-	String query= request.getParameter("query");
 	        Search search = new Search(query);
             List<web>result=search.searchresult();
     	    for(int i=0;i<50&&i<result.size();i++){
@@ -100,21 +114,19 @@ if(request.getParameter("query")!="")
     	            out.println("No more relevant webpage.");
     	            break;
     	        }
-                out.println(cur_web.getScore()+"Title:"+"<a href="+cur_web.getUrl()+">"+cur_web.getCompletetitle()+"</a><br>");
-                out.println("Urls"+"<a href="+cur_web.getUrl()+">"+cur_web.getUrl()+"</a><br>");
+    	        out.println("Page " +(i+1)+" :<br>");
+                out.println("Score : "+cur_web.getScore()+" Title:"+"<a href="+cur_web.getUrl()+">"+cur_web.getCompletetitle()+"</a><br>");
+                out.println("Urls : "+"<a href="+cur_web.getUrl()+">"+cur_web.getUrl()+"</a><br>");
                 Date date = new Date(cur_web.getLastmodified_date());
                 out.println("    "+"Last Modified Date : "+date+" , Size : "+cur_web.getsize()+"B<br>");
                 out.println(print_word(cur_web));
-                out.println(print_link(cur_web.getParent()));
-                out.println(print_link(cur_web.getChild()));
+                out.println("Parent  : <br>"+print_link(cur_web.getParent()));
+                out.println("Child  : <br>"+print_link(cur_web.getChild()));
                 out.println("<br><br>");
     	    }
 
 }
-else
-{
-	out.println("You input nothing");
-}
+
 
 %>
 
