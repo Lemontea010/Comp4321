@@ -1,3 +1,5 @@
+package search;
+
 import org.htmlparser.beans.LinkBean;
 import org.htmlparser.util.ParserException;
 import org.jsoup.Jsoup;
@@ -31,7 +33,7 @@ public class Crawler {
     public ArrayList<String> extractContent() throws IOException {
 
         ArrayList<String> titleandcontent = new ArrayList<>();
-        // Load the web page content
+        // Load the search.web page content
         Document doc = Jsoup.connect(this.url).get();
 
         // Extract the title

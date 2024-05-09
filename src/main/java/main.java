@@ -9,8 +9,8 @@ import java.io.IOException;
     {
         try
         {
-            RecordManager db=RecordManagerFactory.createRecordManager("Spider");
-            Spider spider =new Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
+            RecordManager db=RecordManagerFactory.createRecordManager("search.Spider");
+            search.Spider spider =new search.Spider("https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm");
 
 
         }

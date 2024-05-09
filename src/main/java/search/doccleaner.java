@@ -1,4 +1,7 @@
+package search;
+
 import org.htmlparser.util.ParserException;
+
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -266,5 +269,9 @@ public class doccleaner {
         URLConnection connection =url.openConnection();
         return connection.getLastModified();
     }
+    public static long get_today_date(){
+        Date d =new Date();
 
+        return d.getTime();
+    }
 }

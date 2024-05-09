@@ -1,12 +1,12 @@
+package search;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
-import java.util.Iterator;
-
 import java.util.Vector;
 
-import jdbm.helper.Serializer;
 import org.htmlparser.util.ParserException;
+
 import java.io.IOException;
 
 public  class web implements Serializable {
@@ -19,6 +19,12 @@ public  class web implements Serializable {
     private Vector<String> parent_urls;
     private Vector<String> title;
     private Vector<String> body;
+    private long update_date;
+
+
+
+
+
     private double score;
     private String completetitle;
 
@@ -26,7 +32,7 @@ public  class web implements Serializable {
     private HashMap<String, Integer> hashbody; // <word , freq>
 
 
-    web(String _url,int _id,Vector<String> child) throws ParserException, IOException {
+    public web(String _url,int _id,Vector<String> child) throws ParserException, IOException {
 
         this.url=_url;
         this.id=_id;
@@ -40,6 +46,7 @@ public  class web implements Serializable {
         this.body=doccleaner.bodyprocessing(_url);
         this.completetitle = doccleaner.gettitle(this.url);
         this.lastmodified_date=doccleaner.get_lastmodified(this.url);
+        this.update_date=doccleaner.get_today_date();
 
         this.hashtitle = new HashMap<>();
         this.hashbody = new HashMap<>();
@@ -71,17 +78,17 @@ public  class web implements Serializable {
         }*/
 
     }
-    String getUrl(){
+    public String getUrl(){
         return url;
     }
 
     public int getid(){ return id;}
 
-    Vector<String> getChild(){
+    public Vector<String> getChild(){
         return child_urls;
     }
 
-    Vector<String> getParent(){
+    public Vector<String> getParent(){
         return parent_urls;
     }
 
@@ -123,6 +130,7 @@ public  class web implements Serializable {
     public Vector<String> getBody(){
         return body;
     }
+    public long getUpdate_date(){return update_date;}
 
     public void setScore(double Score){
         this.score = Score;

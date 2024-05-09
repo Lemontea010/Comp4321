@@ -1,9 +1,11 @@
+package search;
+
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
-import org.htmlparser.util.ParserException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -19,8 +21,9 @@ public class Search {
 
     public Search(String query) throws IOException {
         this.query = query;
-
-        RecordManager recman = RecordManagerFactory.createRecordManager("Spider");
+        String var10000 = System.getProperty("user.dir");
+        String pa = var10000 + File.separator + "search.Spider";
+        RecordManager recman = RecordManagerFactory.createRecordManager(pa);
         long recid = recman.getNamedObject("id_to_web");
         hashtable = HTree.load(recman, recid);
         long recidoftitle = recman.getNamedObject("Htree_title");
@@ -44,7 +47,7 @@ public class Search {
         return doccleaner.queryprocessing(query);
     }
 
-    public String getstemmedquery() throws ParserException {
+    public String getstemmedquery()  {
         /** get the complete stemmed query as a sentence */
         StringBuilder builder = new StringBuilder();
         Vector<String> queryitem = stemmingquery(this.query);
@@ -99,12 +102,12 @@ public class Search {
         return totalweight;
     }
 
-    public List<web> searchresult() throws ParserException, IOException {
+    public List<web> searchresult() throws  IOException {
         ArrayList<web> result = new ArrayList<>();
 
         /** combine single item and bigram item */
 
-        //iterate all web and compute cosine similarity
+        //iterate all search.web and compute cosine similarity
         int key = 1;
         while(hashtable.get(key)!=null)
         {
@@ -146,14 +149,14 @@ public class Search {
                 continue;
             }
             //output the results in the console
-            /** iterate element in web result */
+            /** iterate element in search.web result */
             try {
                 List<web> searchresult = result.searchresult();
                 if (searchresult.isEmpty()) {
                     System.out.println("No result with stemmed entered : " + result.getstemmedquery());
                 }
                 else {
-                    System.out.println("Search result with stemmed enter : "+ result.getstemmedquery());
+                    System.out.println("search.Search result with stemmed enter : "+ result.getstemmedquery());
                 }
                 int numberofresult = searchresult.size();
                 if (numberofresult>50){
@@ -162,11 +165,11 @@ public class Search {
                 for (int i = 0; i< numberofresult; i++){
                     web resultweb = searchresult.get(i);
                     if (resultweb.getScore() == 0){
-                        break; // since the list is sorted , all subsequent web score 0
+                        break; // since the list is sorted , all subsequent search.web score 0
                     }
                     System.out.println(resultweb.getCompletetitle()+" "+resultweb.getScore());
                 }
-            } catch (ParserException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
